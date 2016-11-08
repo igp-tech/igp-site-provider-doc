@@ -2,7 +2,9 @@ swagger: '2.0'
 info:
   title: Site provider api
   description: |
-    ![Logo](https://cloud.githubusercontent.com/assets/23325219/20082512/9d16db78-a556-11e6-828d-d22db7cb46f1.png)
+    ![Logo](https://scdn.ntgm.rocks/image/OTH/200/auto/igp-logo-dark.png)
+    
+    
     Version 2.0 Of the Site Provider containers the re-engineering of the registration endpoints, introducing
     dynamic schemas and PlayerRegistration objects.
     
