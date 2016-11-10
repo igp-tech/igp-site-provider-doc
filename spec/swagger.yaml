@@ -176,6 +176,19 @@ paths:
                 properties:
                   valid:
                     type: boolean
+        '400' :
+          description: Invalid Data or validation failed.
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/ValidatorViolation"
+                
+                
     post:
       tags:
         - Player
@@ -951,6 +964,8 @@ definitions:
   
   DropDownValue:
     type: object
+    required:
+      - value
     properties:
       order:
         type: integer
@@ -967,6 +982,8 @@ definitions:
   Validators:
     description: A validator with order, as returned with other validators.
     type: object
+    required:
+      - order
     properties:
       order:
         type: integer
@@ -974,8 +991,38 @@ definitions:
       validator:
         $ref: "#/definitions/Validator"
   
-  BaseValidator:
-    description: The base definition of Validators and Validator responses.
+  ValidatorViolation:
+    description: |
+     Data regarding the violation of of a validator
+    type: object
+    required:
+      - key
+      - invalid_message
+    properties:
+      key:
+        type: string
+        description: Twelve charactar (UPPER CASE), unique short code idenfifying the validator
+        minLength: 12
+        maxLength : 12
+      invalid_message:
+        description: The slug that will be returned upon invalidation. 
+        type: string
+        minLength: 5
+        maxLength: 15
+      warning:
+        type: boolean
+        description: Violations are only warnings
+      violationValue:
+        type: string
+        description: The actual value of the violated field.
+  
+  
+  
+  Validator:
+    description: |
+      A validator definition. Each validator has a name, and a key which identifies the validator. The name and
+      key should be descriptive of that the validator is doing.
+    
     type: object
     properties:
       key:
@@ -991,29 +1038,6 @@ definitions:
       warning:
         type: boolean
         description: Violations are only warnings
-  
-  ValidatorViolation:
-    description: |
-     Data regarding the violation of of a validator
-    type: object
-    properties:
-      additionalProperties:
-        $ref: '#/definitions/BaseValidator'
-      value:
-        type: string
-        description: The actual value of the violated field.
-  
-  
-  
-  Validator:
-    description: |
-      A validator definition. Each validator has a name, and a key which identifies the validator. The name and
-      key should be descriptive of that the validator is doing.
-    
-    type: object
-    properties:
-      additionalProperties:
-        $ref: '#/definitions/BaseValidator'
       name:
         type: string
         description: Full name of the validator
