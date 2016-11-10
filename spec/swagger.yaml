@@ -755,6 +755,59 @@ paths:
         '401':
           $ref: '#/responses/Info'
 definitions:
+  PlayerFavorites:
+    description: Collection of player favorites.
+    type: array
+    items:
+      $ref: "#/definitions/PlayerFavorite"
+  PlayerLatests:
+    description: Collection of player latest games.
+    type: array
+    items:
+      $ref: "#/definitions/PlayerLatest"
+  PlayerRatings:
+    description: Collection of player game ratings.
+    type: array
+    items:
+      $ref: "#/definitions/PlayerRating"
+      
+      
+  PlayerFavorite:
+    description: Storage of player
+    type: object
+    properties:
+      slot:
+        type: integer
+        description: the orginal, base 0 slot number of the favorite
+      gameId:
+        type: string
+        description: The internal id of the game favorited.
+      dateAdded:
+        type: string
+        format: date-time
+    
+  PlayerLatest:
+    description: Latest game data for player.
+    type: object
+    properties:
+      gameid:
+        type: string
+      launchdatetime:
+        type: string
+        format: date-time
+ 
+  PlayerRating:
+    description: A player game rating
+    type: object
+    properties:
+      ratingScore:
+        type: integer
+      gameid:
+        type: string
+      ratingDate:
+        type: string
+        format: date-time
+
   Game:
     description: Game object
     type: object
