@@ -46,7 +46,7 @@ info:
     
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
-  version: "2.1.0"
+  version: "2.1.1"
 tags:
   - name: Player
     description: |
@@ -189,9 +189,16 @@ paths:
               info:
                 $ref: "#/definitions/Info"
               data:
-                type: array
-                items:
-                  $ref: "#/definitions/InvalidField"
+                type: object
+                properties:
+                  record:
+                    type: object
+                    description: Additional information about record level invalidation.
+                  fields:
+                    description: an array of invalid fields, with an array of the invalid validators.
+                    type: array
+                    items:
+                        $ref: "#/definitions/InvalidField"
                 
                 
     post:
