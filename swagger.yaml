@@ -43,7 +43,7 @@ info:
     
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
-  version: "2.0.0"
+  version: "2.0.2"
 tags:
   - name: Player
     description: Player related endpoints
