@@ -1009,9 +1009,6 @@ definitions:
         type: string
         minLength: 5
         maxLength: 15
-      warning:
-        type: boolean
-        description: Violations are only warnings
       violationValue:
         type: string
         description: The actual value of the violated field.
