@@ -5,7 +5,7 @@ info:
     ![Logo](https://scdn.ntgm.rocks/image/OTH/200/auto/igp-logo-dark.png)
     
     
-    Version 2.0 Of the Site Provider containers the re-engineering of the registration endpoints, introducing
+    Version 2.2.X Of the Site Provider completes the re-engineering of the registration endpoints, introducing
     dynamic schemas and PlayerRegistration objects.
     
     ### PlayerSchemas
@@ -43,10 +43,13 @@ info:
     
     TODO: Validator endpoint specification.
     
+    #### AutoLogin
+    
+    The autologin option and functionality is added, if requested, and enabled on the backend, a valid session ID for the new user will be generated and returned in headers when a new player is registered.
     
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
-  version: "2.1.3"
+  version: "2.2.0"
 tags:
   - name: Player
     description: |
@@ -60,10 +63,12 @@ tags:
     description: Cashier Related endpoints
   - name: Registration
     description: Registration related endpoints.
+  - name: Protected
+    description: Endpoints which require a valid session.
 host: dev.pantaloo.com
 schemes:
   - http
-basePath: /api/site
+basePath: /api/v2/site
 produces:
   - application/json
 paths:
@@ -135,11 +140,41 @@ paths:
               data:
                 $ref: "#/definitions/PlayerSchema"
   
+  
+  /player/full:
+    get:
+      tags:
+        - Player
+      summary: Retrieve a player's full profile.
+      description: >
+        Retrieves all player data, including all custom fields, in the form of fieldInstances.
+      parameters:
+        - name: Blue-Session
+          in: header
+          description: Session key
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Valid input
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                $ref: '#/definitions/PlayerData'
+        404:
+          $ref: "#/responses/Info"
+  
   /player:
     get:
       tags:
         - Player
+        - Protected
       summary: Retrieve a player's profile (flat)
+      description: >
+        Retrieves core player information based on the players session.
       parameters:
         - name: Blue-Session
           in: header
@@ -158,19 +193,78 @@ paths:
                 $ref: '#/definitions/Player'
         404:
           $ref: "#/responses/Info"
-    put:
+    patch:
       tags:
         - Player
-      summary: Create (register) a new player by puting a player schema.
+        - Protected
+      summary: Update a player profile
+      description: >
+        Updates (patches) a the profile data for the current session. Only the data
+        which needs to be updated should be submitted.
+        
+        Data is submitted using `fieldInstances` in  a similar manner to `[POST] /player` with arrays of `fieldInstances[Str|Num|Arr|Obj]` in the appropriate property. 
+      parameters:
+        - name: Blue-Session
+          in: header
+          description: Session key
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/PlayerData'
+          
+      responses:
+        '200':
+          description: Valid input
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                $ref: '#/definitions/PlayerData'
+        404:
+          $ref: "#/responses/Info"
+    
+    post:
+      tags:
+        - Player
+      summary: Create (register) a new player by posting a player schema.
+      description: >
+        The fully featured player register endpoint. This endpoint accepts a complex
+        object consisting of arrays of `fieldInstance`s, one for each JSON data type.
+          
+          * Value is string = `fieldInstancesStr`
+          * Value is number = `fieldInstancesNum`
+          * Value is array = `fieldInstancesArr`
+          * Value is object = `fieldInstancesObj`
+          
+          
+          **The schema code for the desired PlayerSchema must be provided.**
+          
+          
+          The sent data will then be validated against the selected schema as well as all core data rules. Upon validation error the response object will contain a list of invalid fields as well as which validation rule or rules were triggered, in order of triggering.
+        
       parameters:
         - name: body
           in: body
           required: true
           schema:
             $ref: '#/definitions/PlayerRegistration'
+        - name: autoLogin
+          in: header
+          type: boolean
+          description: > 
+            Requesting autologin of the player if registration succeeds. If the option is enabled in the site setup, and requested, a valid session id will be returned.
       responses:
-        '200':
-          description: Valid input
+        '201':
+          description: Valid input, player created/registered.
+          headers:
+            'x-sessionid':
+              type: string
+              description: If autologin option was requested, and autologin is enabled for the site, the player's valid `sessionid`.
           schema:
             type: object
             properties:
@@ -182,45 +276,41 @@ paths:
                   valid:
                     type: boolean
         '400' :
-          description: Invalid Data or validation failed.
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              data:
-                type: object
-                properties:
-                  record:
-                    description: Additional information about record level invalidation.
-                    type: array
-                    items:
-                      $ref: "#/definitions/Error"
-                  fields:
-                    description: an array of invalid fields, with an array of the invalid validators.
-                    type: array
-                    items:
-                        $ref: "#/definitions/InvalidField"
+          $ref: "#/responses/InvalidPlayerdata"
                 
-                
-    post:
+    put:
       tags:
         - Player
-      summary: Update player info
+      summary: Create (register) a simple player
+      description: >
+        A simplyfied endpoint for registering a player using limited, predifined 
+        fields.
+        
+        
+        **This method provides a simple registration which give you a shortcut to the most basic required fields to create a player. Under most jurisdictions, the player will not be able to deposit, withdraw or play until the required player data has been submitted via the `POST` method.**
+        
+        
+        **If you wish to use extended/customized fields, use the `POST` method.**
       parameters:
-        - name: Blue-Session
+        - name: autoLogin
           in: header
-          description: Session key
-          required: true
-          type: string
+          description: > 
+            Requesting autologin of the player if registration succeeds. If the option is enabled in the site setup, and requested, a valid session id will be returned.
+          required: false
+          default: false
+          type: boolean
         - name: body
           in: body
           required: true
           schema:
-            $ref: '#/definitions/PlayerInput'
+            $ref: '#/definitions/CorePlayerInput'
       responses:
-        '200':
-          description: Valid input
+        '201':
+          description: Valid input - Player Created
+          headers:
+            'x-sessionid':
+              type: string
+              description: If autologin option was requested, and autologin is enabled for the site, the player's valid `sessionid`.
           schema:
             type: object
             properties:
@@ -231,6 +321,61 @@ paths:
                 properties:
                   valid:
                     type: boolean
+        '400' :
+          $ref: "#/responses/InvalidPlayerdata"
+  /player/checkusername/{username}:
+    head:
+      tags:
+        - Player
+      summary: Check the validity of a username
+      description: >
+        Checks the submitted username to see if is valid for a new user for the site. Checks duplicates and username standards.
+      parameters:
+        - name: username
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK, submitted username is valid, and can be used for a new player.
+          headers:
+            'x-username-valid':
+              type: boolean
+              
+        409: 
+          description: Invalid, the specificed username can **not** be used for new player registration.
+          headers:
+            'x-username-valid':
+              type: boolean
+        400: 
+          description: The username was not submitted correctly, can not validate the username.
+  
+  /player/checkemail/{email}:
+    head:
+      tags:
+        - Player
+      summary: Check the validity of a email
+      description: >
+        Checks the submitted username to see if is valid for a new user for the site. Checks duplicates and username standards.
+      parameters:
+        - name: email
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK, submitted email is valid, and can be used for a new player
+          headers:
+            'x-valid':
+              type: boolean
+              
+        409: 
+          description: Invalid, the specificed email can **not** be used for new player registration.
+          headers:
+            'x-valid':
+              type: boolean
+        400: 
+          description: The email was not submitted correctly, can not validate the username.  
   /player/login:
     post:
       tags:
@@ -265,6 +410,7 @@ paths:
       tags:
         - Player
         - Auth
+        - Protected
       summary: Player logout
       parameters:
         - name: Blue-Session
@@ -287,7 +433,7 @@ paths:
       tags:
         - Player
         - Auth
-      summary: Forgotten password
+      summary: Request a password reset
       parameters:
         - name: body
           in: body
@@ -317,7 +463,8 @@ paths:
       tags:
         - Player
         - Auth
-      summary: Reset password
+        - Protected
+      summary: Reset a players password
       parameters:
         - name: token
           in: path
@@ -351,6 +498,7 @@ paths:
       tags:
         - Player
         - Cashier
+        - Protected
       summary: Player balance
       parameters:
         - name: Blue-Session
@@ -386,6 +534,7 @@ paths:
       tags:
         - Player
         - Cashier
+        - Protected
       summary: Get players transactions
       parameters:
         - name: Blue-Session
@@ -422,6 +571,7 @@ paths:
       tags:
          - Player
          - Cashier
+         - Protected
       summary: 'Get messages for player ( deposit/withdraw confirations, Errors)'
       parameters:
         - name: Blue-Session
@@ -454,6 +604,7 @@ paths:
       tags:
         - Player
         - Cashier
+        - Protected
       summary: Get cashier url
       description: >
         Test credit cards
@@ -483,6 +634,9 @@ paths:
           in: path
           required: true
           type: string
+          enum:
+            - deposit
+            - withdraw
           description: Operations 'deposit' or 'withdrawal'
         - name: processor
           in: query
@@ -493,6 +647,7 @@ paths:
           in: query
           required: false
           type: string
+          default: en_GB
           description: Defaults to en_GB
       responses:
         '200':
@@ -507,11 +662,14 @@ paths:
                 description: Payment url
         '401':
           $ref: '#/responses/Info'
+ 
+ 
   '/game/{id}':
     get:
       tags:
         - Game Library
-      summary: Get game
+        - Protected
+      summary: Get a single game
       parameters:
         - name: Blue-Session
           in: header
@@ -534,6 +692,7 @@ paths:
           in: query
           required: false
           type: string
+          default : en
           description: Default 'en'
         - name: homeurl
           in: query
@@ -557,6 +716,7 @@ paths:
       tags:
         - Player
         - Cashier
+        - Protected
       summary: Player iframe pages
       parameters:
         - name: Blue-Session
@@ -568,11 +728,16 @@ paths:
           in: path
           required: true
           type: string
+          enum:
+            - profile
+            - cashier
+            - register
           description: 'Options profile, cashier, register'
         - name: lang
           in: query
           description: Set page language, defaults to en_GB
           required: false
+          default: en_GB
           type: string
       responses:
         '200':
@@ -628,10 +793,11 @@ definitions:
       - email
       - fname
       - lname
-      - password
-      - password_confirmation
       - terms
     properties:
+      revId:
+        type: integer
+        description: the internal system revision id. Must be submitted with patch.
       username:
         type: string
       email:
@@ -639,10 +805,6 @@ definitions:
       fname:
         type: string
       lname:
-        type: string
-      password:
-        type: string
-      password_confirmation:
         type: string
       terms:
         type: boolean
@@ -652,9 +814,6 @@ definitions:
       newsletter:
         type: boolean
         description: (optional)
-      captcha:
-        type: string
-        description: required only if enabled for your api
       currency:
         type: string
         description: required only if multicurrency enabled
@@ -684,12 +843,27 @@ definitions:
         type: string
       languagecode:
         type: string
-        description: (optional) en_GB, it_IT, ..
+        description: language locale code
+        example: 
+          -  en_GB
+          - it_IT
       sessionid:
         type: string
-  PlayerInput:
-    description: Player object
+  
+  CorePlayerInput:
+    description: >
+      The most basic player data required for a player registration. 
     type: object
+    required:
+      - username
+      - email
+      - fname
+      - lname
+      - password
+      - password_confirmation
+      - terms
+      - birthdate
+      - countrycode
     properties:
       username:
         type: string
@@ -703,50 +877,19 @@ definitions:
         type: string
       password_confirmation:
         type: string
+        description: Must be the same as the password.
       terms:
         type: boolean
-      ref_code:
-        type: string
-        description: (optional) create player under some subagent
-      newsletter:
-        type: boolean
-        description: (optional)
-      captcha:
-        type: string
-        description: required only if enabled for your api
-      currency:
-        type: string
-        description: required only if multicurrency enabled
-      gender:
-        type: string
-        description: (optional)
-        enum:
-          - M
-          - F
       birthdate:
         type: string
-        description: YYYY-MM-DD, required if not a simple reg.
-      address:
-        type: string
-        description: required if not a simple reg.
-      city:
-        type: string
-        description: required if not a simple reg.
-      zip:
-        type: string
-        description: required if not a simple reg.
-      mobile:
-        type: string
-        description: (optional)
-      phone:
-        type: string
-        description: (optional)
+        description: YYYY-MM-DD
       countrycode:
         type: string
         description: two letter country code in lowercase
-      languagecode:
+      captcha:
         type: string
-        description: (optional) en_GB, it_IT, ..
+        
+
   Transaction:
     description: Transaction
     type: object
@@ -776,6 +919,34 @@ definitions:
       accountuser:
         type: string
   
+  
+  PlayerData:
+    description: >
+      Object for submitting updates to player profile data. Similar to `PlayerRegistration`, but it is hardcoded to the PlayerProfile schema.
+    type: object
+    required:
+      - revId
+    properties:
+      revId:
+        description: > 
+         The internal system revisionID, which was received from player GET. Submitting the revision id back to the system on update ensures that you will not unknowingly overwrite a concurent request.
+        type: integer
+      fieldInstancesStr:
+        type: array
+        items:
+          $ref: "#/definitions/FieldInstanceStr"
+      fieldInstancesNum:
+        type: array
+        items:
+          $ref: "#/definitions/FieldInstanceNum"
+      fieldInstancesArr:
+        type: array
+        items:
+          $ref: "#/definitions/FieldInstanceArr"
+      fieldInstancesObj:
+        type: array
+        items:
+          $ref: "#/definitions/FieldInstanceObj"
   
   PlayerRegistration:
     description: |
@@ -975,6 +1146,11 @@ definitions:
             type: string
           required:
             type: boolean
+            description: This field is required, and must have a valid value.
+          readOnly:
+            type: boolean
+            default: false
+            description: This field cannot be changed by the API after original submission, due to sustem or complience reasons.
           valueList:
             type: array
             items:
@@ -1091,7 +1267,29 @@ definitions:
         description: The size of each page, 0 if no paging.
         type: integer
   
+
+
 responses:
+  InvalidPlayerdata:
+    description: Information returned when player data posted is invalidated by the schema.
+    schema:
+          type: object
+          properties:
+            info:
+              $ref: "#/definitions/Info"
+            data:
+              type: object
+              properties:
+                record:
+                  description: Additional information about record level invalidation.
+                  type: array
+                  items:
+                    $ref: "#/definitions/Error"
+                fields:
+                  description: an array of invalid fields, with an array of the invalid validators.
+                  type: array
+                  items:
+                      $ref: "#/definitions/InvalidField"
   Info:
     description: Response information
     schema:
