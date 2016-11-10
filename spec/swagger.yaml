@@ -974,31 +974,55 @@ definitions:
       validator:
         $ref: "#/definitions/Validator"
   
-  Validator:
-    description: The definition of a field validator.
+  BaseValidator:
+    description: The base definition of Validators and Validator responses.
     type: object
     properties:
-      name:
+      key:
         type: string
-        description: Full name of the validator
-      code:
-        type: string
-        description: Seven charactar (UPPER CASE), unique short code idenfifying the validator
-        minLength: 7
-        maxLength : 7
-      description: 
-        type: string
-        description: A developers description of what the validator validates, not for use on the UI.
-      invalidSlug:
+        description: Twelve charactar (UPPER CASE), unique short code idenfifying the validator
+        minLength: 12
+        maxLength : 12
+      invalid_message:
         description: The slug that will be returned upon invalidation. 
         type: string
         minLength: 5
-        maxLength: 10
-      validSlug:
+        maxLength: 15
+      warning:
+        type: boolean
+        description: Violations are only warnings
+  
+  ValidatorViolation:
+    description: |
+     Data regarding the violation of of a validator
+    type: object
+    properties:
+      additionalProperties:
+        $ref: '#/definitions/BaseValidator'
+      value:
         type: string
-        minLength: 5
-        maxLength: 10
-        description: THe slug that will be returned when valid. (Usually not present/used.)
+        description: The actual value of the violated field.
+  
+  
+  
+  Validator:
+    description: |
+      A validator definition. Each validator has a name, and a key which identifies the validator. The name and
+      key should be descriptive of that the validator is doing.
+    
+    type: object
+    properties:
+      additionalProperties:
+        $ref: '#/definitions/BaseValidator'
+      name:
+        type: string
+        description: Full name of the validator
+      parameters:
+        description: Key value pair of parameters for the validator
+        type: object
+      description: 
+        type: string
+        description: A developers description of what the validator validates, not for use on the UI.
   
   Info:
     description: Response information, anything that is not response data itself.
