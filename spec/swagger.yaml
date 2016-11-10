@@ -46,17 +46,19 @@ info:
     
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
-  version: "2.0.3"
+  version: "2.1.0"
 tags:
   - name: Player
-    description: Player related endpoints
+    description: |
+      Player related endpoints. Endpoints for registering new players, getting player information, as well
+      as retriving the datamodeles/ schemas for the sites player data.
   - name: Game Library
     description: Game Library and Game Related Enpoints
   - name: Auth
     description: Authorization and password related endpoints
   - name : Cashier
     description: Cashier Related endpoints
-  - name: Registriation
+  - name: Registration
     description: Registration related endpoints.
 host: dev.pantaloo.com
 schemes:
@@ -87,10 +89,15 @@ paths:
       tags:
         - Player
         - Registration
-      summary: |
-        Returns full definition of the player schemas available for the portal. 
-        Usually portals have 3 schemas; registrationFull, registrationQuick, PlayerProfile.
+      description: | 
+         Returns full definition of the player schemas available for the portal. 
         
+          Usually portals have 3 schemas:
+        
+          * registrationFull
+          * registrationQuick 
+          * PlayerProfile.
+      summary: Retrieve all player schemas for site.
       responses:
         '200':
           description: Response object
@@ -110,9 +117,7 @@ paths:
       tags:
         - Player
         - Registration
-        - Profile
-      summary: |
-        Returns a single PlayerProfile by code
+      summary: Retrieve a single PlayerProfile by code
       parameters:
         - name: schemaCode
           in: query
@@ -134,7 +139,7 @@ paths:
     get:
       tags:
         - Player
-      summary: Player profile
+      summary: Retrieve a player's profile (flat)
       parameters:
         - name: Blue-Session
           in: header
@@ -156,7 +161,7 @@ paths:
     put:
       tags:
         - Player
-      summary: Player registration (create player), posting a PlayerRegistration Object.
+      summary: Create (register) a new player by puting a player schema.
       parameters:
         - name: body
           in: body
@@ -186,7 +191,7 @@ paths:
               data:
                 type: array
                 items:
-                  $ref: "#/definitions/ValidatorViolation"
+                  $ref: "#/definitions/InvalidField"
                 
                 
     post:
@@ -767,8 +772,14 @@ definitions:
     description: |
       Object for submitting player registration data. Since player registration data is dynamic, and based on
       dynamic schemas, with dynamic value types, registration data is submitted using an object which contains
-      arrays of the 4 possible value types; strings, numbers, arrays and Objects. This combination of field
-      name, type and value is termed a FieldInstance.
+      arrays of the 4 possible value types; 
+        
+        * strings
+        * numbers
+        * arrays
+        * objects
+        
+        This combination of field name, type and value is termed a FieldInstance.
     
     type: object
     properties:
@@ -824,6 +835,19 @@ definitions:
       code:
         type: string
         description: unique code for the field
+  
+  InvalidField:
+    type: object
+    properties:
+      code:
+        type: string
+        description: unique code for the field
+      validators:
+        description: Array of validators, with only the required fields.
+        type: array
+        items:
+            $ref: "#/definitions/Validators"
+
       
   FieldInstance:
     description: Base field instance, for which all field instance types are desendant. 
@@ -990,37 +1014,15 @@ definitions:
         description: The order in which the validator is applied.
       validator:
         $ref: "#/definitions/Validator"
-  
-  ValidatorViolation:
-    description: |
-     Data regarding the violation of of a validator
-    type: object
-    required:
-      - key
-      - invalid_message
-    properties:
-      key:
-        type: string
-        description: Twelve charactar (UPPER CASE), unique short code idenfifying the validator
-        minLength: 12
-        maxLength : 12
-      invalid_message:
-        description: The slug that will be returned upon invalidation. 
-        type: string
-        minLength: 5
-        maxLength: 15
-      violationValue:
-        type: string
-        description: The actual value of the violated field.
-  
-  
-  
   Validator:
     description: |
       A validator definition. Each validator has a name, and a key which identifies the validator. The name and
       key should be descriptive of that the validator is doing.
     
     type: object
+    required:
+      - key
+      - invalid_message
     properties:
       key:
         type: string
@@ -1072,13 +1074,9 @@ definitions:
         description: The size of each page, 0 if no paging.
         type: integer
   
-  
-          
-  
 responses:
   Info:
-    description: Response information, anything that is not response data itself, includes error
-      information.
+    description: Response information
     schema:
       type: object
       required:
@@ -1104,3 +1102,5 @@ responses:
         pageSize:
           description: The size of each page, 0 if no paging.
           type: integer
+  
+      
