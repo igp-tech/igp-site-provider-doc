@@ -49,7 +49,7 @@ info:
     
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
-  version: "2.2.0"
+  version: "2.3.0"
 tags:
   - name: Player
     description: |
@@ -376,6 +376,189 @@ paths:
               type: boolean
         400: 
           description: The email was not submitted correctly, can not validate the username.  
+  /player/favorites:
+    head:
+      tags:
+        - Player
+        - Protected
+      summary: Get the count of player favorites
+      description: > 
+        Returns the count of player favorites in header.
+      parameters:
+        - $ref: "#/parameters/Session"
+      responses:
+        200:
+          description: OK Favorites, found
+          headers:
+            "x-favorite-count":
+              type: integer
+              description: Count of favorites for player
+        401:
+            description: Invalid session
+            headers:
+              "x-error-code":
+                type: string
+                description: error code
+    get:
+      tags:
+        - Player
+        - Protected
+      summary: Get a players favorite games.
+      description: > 
+        Retrieve the list of the players favorite games, as stored by the player. The platform provides an unlimited number of "slots" which are simply integers for storing the favorites. The system does not check for you if you assing more than one favorite to the same slot, so you may want to check that yourself.
+      parameters:
+        - $ref: "#/parameters/Session"
+      responses:
+        200:
+          description: OK Favorites, found
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                $ref: '#/definitions/PlayerFavorites'
+        401:
+          description: Invalid session
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        404: 
+          description: Player has no favorites
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+    post:
+      tags:
+        - Player
+        - Protected
+      summary: Post a list of favorite games.
+      description: > 
+        Post an entire list of player favorites, will overwrite existing list.
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref : "#/definitions/PlayerFavorites"  
+        
+      responses:
+        200:
+          description: Ok, favorite list updated.
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        201:
+          description: Ok, favorite list created.
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        401:
+          description: Invalid session
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400: 
+          description: Invalid favorites data.
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+    put:
+        tags:
+          - Player
+          - Protected
+        summary: Add or modify a single favorite listing
+        description: > 
+          Add or modify a list of player favorites, keyed on game id.
+        parameters:
+          - $ref: "#/parameters/Session"
+          - name: body
+            in: body
+            required: true
+            schema:
+              $ref : "#/definitions/PlayerFavorite"  
+          
+        responses:
+          200:
+            description: Existing Favorite updated.
+            schema:
+              type: object
+              properties:
+                info:
+                  $ref: "#/definitions/Info"
+          201:
+            description: New Favorite created.
+            schema:
+              type: object
+              properties:
+                info:
+                  $ref: "#/definitions/Info"
+          401:
+            description: Invalid session
+            schema:
+              type: object
+              properties:
+                info:
+                  $ref: "#/definitions/Info"
+          400: 
+            description: Invalid favorites data.
+            schema:
+              type: object
+              properties:
+                info:
+                  $ref: "#/definitions/Info"
+    delete:
+        tags:
+          - Player
+          - Protected
+        summary: Remove a favorite listing
+        description: > 
+          Remove a favorite listing of player favorites, keyed on game id.
+        parameters:
+          - $ref: "#/parameters/Session"
+          - name: body
+            in: body
+            required: true
+            schema:
+              $ref : "#/definitions/PlayerFavorite"  
+          
+        responses:
+          200:
+            description: Favorite deleted.
+            schema:
+              type: object
+              properties:
+                info:
+                  $ref: "#/definitions/Info"
+          401:
+            description: Invalid session
+            schema:
+              type: object
+              properties:
+                info:
+                  $ref: "#/definitions/Info"
+          404: 
+            description: Favorite not found
+            schema:
+              type: object
+              properties:
+                info:
+                  $ref: "#/definitions/Info"
+          
+    
   /player/login:
     post:
       tags:
@@ -755,6 +938,8 @@ paths:
         '401':
           $ref: '#/responses/Info'
 definitions:
+
+
   PlayerFavorites:
     description: Collection of player favorites.
     type: array
@@ -775,9 +960,14 @@ definitions:
   PlayerFavorite:
     description: Storage of player
     type: object
+    required:
+      - slot
+      - gameId
+      - dateAdded
     properties:
       slot:
         type: integer
+        default : 0
         description: the orginal, base 0 slot number of the favorite
       gameId:
         type: string
@@ -807,6 +997,9 @@ definitions:
       ratingDate:
         type: string
         format: date-time
+      ratingNote:
+        type: string
+        description: Text rating of the game by player.
 
   Game:
     description: Game object
@@ -1370,5 +1563,13 @@ responses:
         pageSize:
           description: The size of each page, 0 if no paging.
           type: integer
+
+parameters:
+  Session:
+    name: Blue-Session
+    in: header
+    description: Session key
+    required: true
+    type: string
   
       
