@@ -5,7 +5,7 @@ info:
     ![Logo](https://scdn.ntgm.rocks/image/OTH/200/auto/igp-logo-dark.png)
     
     
-    Version 2.2.X Of the Site Provider completes the re-engineering of the registration endpoints, introducing
+    Version 2.3.X Of the Site Provider completes the re-engineering of the registration endpoints, introducing
     dynamic schemas and PlayerRegistration objects.
     
     ### PlayerSchemas
@@ -61,7 +61,7 @@ info:
     
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
-  version: "2.3.2"
+  version: "2.3.4"
 tags:
   - name: Player
     description: |
@@ -124,7 +124,7 @@ paths:
             type: object
             properties:
               info:
-                $ref: "#/definitions/Info"
+                $ref: "#/definitions/PagedInfo"
               data:
                 type: array
                 description: An array of player schemas
@@ -1730,6 +1730,24 @@ definitions:
       responseTime:
         type: number
         format: float
+        
+  PagedInfo:
+    description: Response information, anything that is not response data itself.
+    type: object
+    required:
+      - success
+      - resultCode
+    properties:
+      success:
+        type: boolean
+        default: true
+      resultCode:
+        type: string
+      message:
+        type: string
+      responseTime:
+        type: number
+        format: float
       pageNum: 
         description: The current page number, 0 if no pages
         type: integer
@@ -1739,7 +1757,6 @@ definitions:
       pageSize:
         description: The size of each page, 0 if no paging.
         type: integer
-  
 
 
 responses:
@@ -1763,34 +1780,25 @@ responses:
                   type: array
                   items:
                       $ref: "#/definitions/InvalidField"
-  Info:
-    description: Response information
-    schema:
-      type: object
-      required:
-        - success
-        - resultCode
-      properties:
-        success:
-          type: boolean
-          default: true
-        resultCode:
-          type: string
-        message:
-          type: string
-        responseTime:
-          type: number
-          format: float
-        pageNum: 
-          description: The current page number, 0 if no pages
-          type: integer
-        pages:
-          description: The total number of pages, 0 if not paged.
-          type: integer
-        pageSize:
-          description: The size of each page, 0 if no paging.
-          type: integer
 
+  Info:
+    description: Basic information
+    schema:
+        type: object
+        required:
+          - success
+          - resultCode
+        properties:
+          success:
+            type: boolean
+            default: true
+          resultCode:
+            type: string
+          message:
+            type: string
+          responseTime:
+            type: number
+            format: float
 parameters:
   Session:
     name: Blue-Session
