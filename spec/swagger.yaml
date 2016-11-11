@@ -47,6 +47,12 @@ info:
     
     The autologin option and functionality is added, if requested, and enabled on the backend, a valid session ID for the new user will be generated and returned in headers when a new player is registered.
     
+    #### PlayerFavorites
+    The platform provides storage for player an unlimited number of player favorites.
+    YOu can add a favorite list, a single favorite entry, update a single entry, or remove entries directly. 
+    
+    PlayerFavorites have a "slot" integer which can either be used as a priority setting, or simply a ordering function. Multiple favorites can share a "slot", so you can also use this for grouping favorites.
+    
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
   version: "2.3.0"
