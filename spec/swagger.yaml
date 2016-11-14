@@ -28,7 +28,7 @@ info:
       * Country picker
       * Color chooser
       * Link
-    
+
     As well as other standard field types like date, datetime, etc.  
     
     Field definitions provide information such as required status, JSON dataType, grouping information, and field order.
@@ -61,7 +61,7 @@ info:
     
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
-  version: "2.3.4"
+  version: "2.4.0"
 tags:
   - name: Player
     description: |
@@ -79,6 +79,8 @@ tags:
     description: Endpoints which require a valid session.
   - name: Reviews
     description: Endpoints for creating and reading player game reviews.
+  - name: Validation
+    description: Endpoints for validating data
 host: dev.pantaloo.com
 schemes:
   - http
@@ -87,6 +89,17 @@ produces:
   - application/json
 paths:
   /games:
+    head:
+      tags:
+        - Game Library
+      summary: Get the count of games available on site.
+      responses:
+        '200':
+          description: Response headers
+          headers:
+            "x-game-count":
+              type: integer
+              description: Count of games for site.
     get:
       tags:
         - Game Library
@@ -94,6 +107,10 @@ paths:
       responses:
         '200':
           description: Response object
+          headers:
+            "x-game-count":
+              type: integer
+              description: Count of games for site.
           schema:
             type: object
             properties:
@@ -103,6 +120,57 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/Game'
+
+  /games/{id}:
+    get:
+      tags:
+        - Game Library
+        - Protected
+      summary: Get a single game
+      parameters:
+        - name: Blue-Session
+          in: header
+          description: Session key
+          required: false
+          type: string
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: Game id
+        - name: play_for_fun
+          in: query
+          required: false
+          type: string
+          description: >-
+            By default disabled, set to 1 to enable play for fun mode. Session
+            header not require if this option is present
+        - name: lang
+          in: query
+          required: false
+          type: string
+          default : en
+          description: Default 'en'
+        - name: homeurl
+          in: query
+          required: false
+          type: string
+          description: Home url or return url. All games may not support this, usually for mobile ones
+      responses:
+        '200':
+          description: Game
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                $ref: '#/definitions/Game'
+        '400':
+          $ref: '#/responses/Info'
+        401:
+          $ref: "#/responses/AuthError"
+
   /player/schemas:
     get:
       tags:
@@ -153,7 +221,50 @@ paths:
                 $ref: "#/definitions/Info"
               data:
                 $ref: "#/definitions/PlayerSchema"
-  
+      
+    post:
+      tags:
+        - Player
+      summary: Check the registration data for a new player without creating it.
+      description: >
+        Validates player schema data.  Same as `/player/ [POST]`, but does not actually create the player, just returns if data is schema valid.
+          See `/player [post] for more information.`
+          
+          Is an alias for `/validate/player [POST]`
+          
+          
+          
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/PlayerRegistration'
+        - name: autoLogin
+          in: header
+          type: boolean
+          description: > 
+            Requesting autologin of the player if registration succeeds. If the option is enabled in the site setup, and requested, a valid session id will be returned.
+      responses:
+        '201':
+          description: Valid input, player created/registered.
+          headers:
+            'Blue-session':
+              type: string
+              description: If autologin option was requested, and autologin is enabled for the site, the player's valid `sessionid`.
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+        '400' :
+          $ref: "#/responses/InvalidPlayerdata"
+    
   
   /player/full:
     get:
@@ -168,6 +279,90 @@ paths:
           description: Session key
           required: true
           type: string
+      responses:
+        '200':
+          description: Valid input
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                $ref: '#/definitions/PlayerData'
+        404:
+          $ref: "#/responses/Info"
+    post:
+      tags:
+        - Player
+      summary: Create (register) a new player by posting a player schema.
+      description: >
+        The fully featured player register endpoint. This endpoint accepts a complex
+        object consisting of arrays of `fieldInstance`s, one for each JSON data type.
+          
+          * Value is string = `fieldInstancesStr`
+          * Value is number = `fieldInstancesNum`
+          * Value is array = `fieldInstancesArr`
+          * Value is object = `fieldInstancesObj`
+          
+          
+          **The schema code for the desired PlayerSchema must be provided.**
+          
+          
+          The sent data will then be validated against the selected schema as well as all core data rules. Upon validation error the response object will contain a list of invalid fields as well as which validation rule or rules were triggered, in order of triggering.
+        
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/PlayerRegistration'
+        - name: autoLogin
+          in: header
+          type: boolean
+          description: > 
+            Requesting autologin of the player if registration succeeds. If the option is enabled in the site setup, and requested, a valid session id will be returned.
+      responses:
+        '201':
+          description: Valid input, player created/registered.
+          headers:
+            'Blue-Session':
+              type: string
+              description: If autologin option was requested, and autologin is enabled for the site, the player's valid `sessionid`.
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+        '400' :
+          $ref: "#/responses/InvalidPlayerdata"
+          
+    patch:
+      tags:
+        - Player
+        - Protected
+      summary: Update a player profile
+      description: >
+        Updates (patches) a the profile data for the current session. Only the data
+        which needs to be updated should be submitted.
+        
+        Data is submitted using `fieldInstances` in  a similar manner to `[POST] /player/full` with arrays of `fieldInstances[Str|Num|Arr|Obj]` in the appropriate property. 
+      parameters:
+        - name: Blue-Session
+          in: header
+          description: Session key
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/PlayerData'
+          
       responses:
         '200':
           description: Valid input
@@ -207,90 +402,6 @@ paths:
                 $ref: '#/definitions/Player'
         404:
           $ref: "#/responses/Info"
-    patch:
-      tags:
-        - Player
-        - Protected
-      summary: Update a player profile
-      description: >
-        Updates (patches) a the profile data for the current session. Only the data
-        which needs to be updated should be submitted.
-        
-        Data is submitted using `fieldInstances` in  a similar manner to `[POST] /player` with arrays of `fieldInstances[Str|Num|Arr|Obj]` in the appropriate property. 
-      parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: true
-          type: string
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/PlayerData'
-          
-      responses:
-        '200':
-          description: Valid input
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              data:
-                $ref: '#/definitions/PlayerData'
-        404:
-          $ref: "#/responses/Info"
-    
-    post:
-      tags:
-        - Player
-      summary: Create (register) a new player by posting a player schema.
-      description: >
-        The fully featured player register endpoint. This endpoint accepts a complex
-        object consisting of arrays of `fieldInstance`s, one for each JSON data type.
-          
-          * Value is string = `fieldInstancesStr`
-          * Value is number = `fieldInstancesNum`
-          * Value is array = `fieldInstancesArr`
-          * Value is object = `fieldInstancesObj`
-          
-          
-          **The schema code for the desired PlayerSchema must be provided.**
-          
-          
-          The sent data will then be validated against the selected schema as well as all core data rules. Upon validation error the response object will contain a list of invalid fields as well as which validation rule or rules were triggered, in order of triggering.
-        
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/PlayerRegistration'
-        - name: autoLogin
-          in: header
-          type: boolean
-          description: > 
-            Requesting autologin of the player if registration succeeds. If the option is enabled in the site setup, and requested, a valid session id will be returned.
-      responses:
-        '201':
-          description: Valid input, player created/registered.
-          headers:
-            'x-sessionid':
-              type: string
-              description: If autologin option was requested, and autologin is enabled for the site, the player's valid `sessionid`.
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              data:
-                type: object
-                properties:
-                  valid:
-                    type: boolean
-        '400' :
-          $ref: "#/responses/InvalidPlayerdata"
                 
     put:
       tags:
@@ -337,10 +448,11 @@ paths:
                     type: boolean
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
-  /player/checkusername/{username}:
+  /player/validate/username/{username}:
     head:
       tags:
         - Player
+        - Validation
       summary: Check the validity of a username
       description: >
         Checks the submitted username to see if is valid for a new user for the site. Checks duplicates and username standards.
@@ -364,10 +476,11 @@ paths:
         400: 
           description: The username was not submitted correctly, can not validate the username.
   
-  /player/checkemail/{email}:
+  /player/validate/email/{email}:
     head:
       tags:
         - Player
+        - Validation
       summary: Check the validity of a email
       description: >
         Checks the submitted username to see if is valid for a new user for the site. Checks duplicates and username standards.
@@ -425,6 +538,10 @@ paths:
       responses:
         200:
           description: OK Favorites, found
+          headers:
+            "x-favorite-count":
+              type: integer
+              description: Count of favorites for player
           schema:
             type: object
             properties:
@@ -1005,6 +1122,62 @@ paths:
                       enum:
                         - notification
                         - Error
+  
+  /player/cashier/custom:
+    get:
+      summary: Custom cashier
+      tags:
+        - Cashier
+        - Player
+        - Protected
+      description: >
+        Lists all available deposit and withdraw methods for the active player
+        with urls to deposit/withdraw forms
+      parameters:
+        - name: Blue-Session
+          in: header
+          description: Session key
+          required: false
+          type: string
+        - name: type
+          in: query
+          required: false
+          type: string
+          enum:
+            - deposit
+            - withdrawal
+            - 
+          description: deposit or withdrawal, if not set you get list of both
+        - name: reUrl
+          in: query
+          required: true
+          type: string
+          description: Return url. In case of error, query param 'error' with description is attached
+      responses:
+        '200':
+          description: Payment url
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              response:
+                type: object
+                properties:
+                  deposit_methods:
+                    $ref: "#/definitions/PaymentMethods"
+                  withdraw_methods:
+                    $ref: "#/definitions/PaymentMethods"
+        400: 
+          $ref : "#/responses/Error"
+        401:
+          $ref : "#/responses/Error"
+            
+
+
+  
+  
+  
   '/player/cashier/{operation}':
     get:
       tags:
@@ -1070,53 +1243,7 @@ paths:
           $ref: '#/responses/Info'
  
  
-  '/game/{id}':
-    get:
-      tags:
-        - Game Library
-        - Protected
-      summary: Get a single game
-      parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: false
-          type: string
-        - name: id
-          in: path
-          required: true
-          type: string
-          description: Game id
-        - name: play_for_fun
-          in: query
-          required: false
-          type: string
-          description: >-
-            By default disabled, set to 1 to enable play for fun mode. Session
-            header not require if this option is present
-        - name: lang
-          in: query
-          required: false
-          type: string
-          default : en
-          description: Default 'en'
-        - name: homeurl
-          in: query
-          required: false
-          type: string
-          description: Home url or return url. All games may not support this, usually for mobile ones
-      responses:
-        '200':
-          description: Game
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              data:
-                $ref: '#/definitions/Game'
-        '500':
-          $ref: '#/responses/Info'
+  
   '/player/page/{page}':
     get:
       tags:
@@ -1325,9 +1452,51 @@ definitions:
       sessionid:
         type: string
   
+  
+  InstantPlayerInput:
+    description: >
+      The  basic player data required for a player registration. 
+    type: object
+    required:
+      - username
+      - email
+      - fname
+      - lname
+      - password
+      - password_confirmation
+      - terms
+      - birthdate
+      - countrycode
+    properties:
+      username:
+        type: string
+      email:
+        type: string
+      fname:
+        type: string
+      lname:
+        type: string
+      password:
+        type: string
+      password_confirmation:
+        type: string
+        description: Must be the same as the password.
+      terms:
+        type: boolean
+      birthdate:
+        type: string
+        description: YYYY-MM-DD
+      countrycode:
+        type: string
+        description: two letter country code in lowercase
+      captcha:
+        type: string
+  
+  
+  
   CorePlayerInput:
     description: >
-      The most basic player data required for a player registration. 
+      The  basic player data required for a player registration. 
     type: object
     required:
       - username
@@ -1758,6 +1927,77 @@ definitions:
         description: The size of each page, 0 if no paging.
         type: integer
 
+  
+  PaymentMethods:
+    description: Payment methods available
+    type: object
+    properties:
+      bank_transfers:
+        type: array
+        items:
+            $ref: "#/definitions/PaymentMethod"
+      credit_cards:
+        type: array
+        items:
+            $ref: "#/definitions/PaymentMethod"
+      instant_banking:
+        type: array
+        items:
+            $ref: "#/definitions/PaymentMethod"
+      e_wallets:
+        type: array
+        items:
+            $ref: "#/definitions/PaymentMethod"
+      prepaid_cards:
+        type: array
+        items:
+            $ref: "#/definitions/PaymentMethod"
+      other:
+        type: array
+        items:
+            $ref: "#/definitions/PaymentMethod"
+  PaymentMethod:
+    description : Information regarding an available deposit method.
+    type: object
+    properties:
+      name:
+        type: string
+      code:
+        type: string
+        description: Code representing the deposit type, to allow for consumer translations.
+      text:
+        type: string
+        description: Payment Text
+      timeStr:
+        type: string
+        description: String decription of the transacction time
+      isInstant:
+        type: boolean
+        default: false
+        description: is the deposit instantly credited to the account
+      fee:
+        type: string
+        description: Text decription of the fee.
+      limits:
+        description: Information about limits for the deposit method, as text.
+        type: object
+        properties:
+          minAmountStr:
+            type: string
+          maxAmountStr:
+            type: string
+          minAmountVal:
+            type: number
+          maxAmountVal:
+            type: number
+      url:
+        type: string
+        description: url link to the payment method
+      image:
+        type: string
+        description: URL to full size image for this payment provider.
+        
+          
 
 responses:
   InvalidPlayerdata:
@@ -1781,6 +2021,15 @@ responses:
                   items:
                       $ref: "#/definitions/InvalidField"
 
+  
+  Error:
+    description: Error Information
+    schema:
+      $ref: "#/definitions/Info"
+  AuthError:
+    description: Authorization error, resource not available for this session or apiKey
+    schema:
+      $ref: "#/definitions/Info"
   Info:
     description: Basic information
     schema:
