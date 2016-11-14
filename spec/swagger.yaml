@@ -1216,7 +1216,7 @@ paths:
                         - notification
                         - Error
   
-  /player/cashier/custom:
+  /player/cashier/custom/{transtype}:
     get:
       summary: Custom cashier
       tags:
@@ -1232,15 +1232,16 @@ paths:
           description: Session key
           required: false
           type: string
-        - name: type
-          in: query
-          required: false
+        - name: transtype
+          in: path
+          required: true
           type: string
           enum:
             - deposit
             - withdrawal
-            - 
-          description: deposit or withdrawal, if not set you get list of both
+            - both
+          
+          description: deposit or withdrawal, or both
         - name: reUrl
           in: query
           required: true
