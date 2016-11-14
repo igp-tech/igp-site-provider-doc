@@ -80,7 +80,7 @@ info:
     
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
-  version: "2.4.1"
+  version: "2.4.2"
 tags:
   - name: Player
     description: |
@@ -536,63 +536,9 @@ paths:
                     type: boolean
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
-  /player/validate/username/{username}:
-    head:
-      tags:
-        - Player
-        - Validation
-      summary: Check the validity of a username
-      description: >
-        Checks the submitted username to see if is valid for a new user for the site. Checks duplicates and username standards.
-      parameters:
-        - name: username
-          in: path
-          required: true
-          type: string
-      responses:
-        200:
-          description: OK, submitted username is valid, and can be used for a new player.
-          headers:
-            'x-username-valid':
-              type: boolean
-              
-        409: 
-          description: Invalid, the specificed username can **not** be used for new player registration.
-          headers:
-            'x-username-valid':
-              type: boolean
-        400: 
-          description: The username was not submitted correctly, can not validate the username.
   
-  /player/validate/email/{email}:
-    head:
-      tags:
-        - Player
-        - Validation
-      summary: Check the validity of a email
-      description: >
-        Checks the submitted username to see if is valid for a new user for the site. Checks duplicates and username standards.
-      parameters:
-        - name: email
-          in: path
-          required: true
-          type: string
-      responses:
-        200:
-          description: OK, submitted email is valid, and can be used for a new player
-          headers:
-            'x-valid':
-              type: boolean
-              
-        409: 
-          description: Invalid, the specificed email can **not** be used for new player registration.
-          headers:
-            'x-valid':
-              type: boolean
-        400: 
-          description: The email was not submitted correctly, can not validate the username.  
   
-  /player/favorites:
+  /player/games/favorites:
     head:
       tags:
         - Player
@@ -778,7 +724,7 @@ paths:
                 info:
                   $ref: "#/definitions/Info"
   
-  /player/ratings:
+  /player/games/ratings:
     head:
       tags:
         - Player
@@ -918,7 +864,7 @@ paths:
                 info:
                   $ref: "#/definitions/Info"
   
-  /player/latests:
+  /player/games/latests:
     get:
       tags:
         - Player
@@ -953,43 +899,7 @@ paths:
               info:
                 $ref: "#/definitions/Info"
     
-    put:
-        tags:
-          - Player
-          - Protected
-        summary: Add a single latest game launch 
-        description: > 
-          Post a game launch.
-        parameters:
-          - $ref: "#/parameters/Session"
-          - name: body
-            in: body
-            required: true
-            schema:
-              $ref : "#/definitions/PlayerLatest"  
-          
-        responses:
-          201:
-            description: New Rating created.
-            schema:
-              type: object
-              properties:
-                info:
-                  $ref: "#/definitions/Info"
-          401:
-            description: Invalid session
-            schema:
-              type: object
-              properties:
-                info:
-                  $ref: "#/definitions/Info"
-          400: 
-            description: Invalid gamelaunch data.
-            schema:
-              type: object
-              properties:
-                info:
-                  $ref: "#/definitions/Info"
+    
                     
     
   /player/login:
@@ -1266,12 +1176,6 @@ paths:
           $ref : "#/responses/Error"
         401:
           $ref : "#/responses/Error"
-            
-
-
-  
-  
-  
   '/player/cashier/{operation}/{processor}':
     get:
       tags:
@@ -1347,9 +1251,6 @@ paths:
                 description: Payment url
         '401':
           $ref: '#/responses/Error'
- 
- 
-  
   '/player/page/{page}':
     get:
       tags:
@@ -1508,7 +1409,61 @@ paths:
               x-is-valid:
                 description: Is the value valid (false)
                 type: boolean
-
+  /validate/player/email/{email}:
+    head:
+      tags:
+        - Player
+        - Validation
+      summary: Check the validity of a email
+      description: >
+        Checks the submitted email to see if is valid for a new user for the site. Checks duplicates and email validity.
+      parameters:
+        - name: email
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK, submitted email is valid, and can be used for a new player
+          headers:
+            'x-valid':
+              type: boolean
+              
+        409: 
+          description: Invalid, the specificed email can **not** be used for new player registration.
+          headers:
+            'x-valid':
+              type: boolean
+        400: 
+          description: The email was not submitted correctly, can not validate the username.  
+  /validate/player/username/{username}:
+    head:
+      tags:
+        - Player
+        - Validation
+      summary: Check the validity of a username
+      description: >
+        Checks the submitted username to see if is valid for a new user for the site. Checks duplicates and username standards.
+      parameters:
+        - name: username
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK, submitted username is valid, and can be used for a new player.
+          headers:
+            'x-username-valid':
+              type: boolean
+              
+        409: 
+          description: Invalid, the specificed username can **not** be used for new player registration.
+          headers:
+            'x-username-valid':
+              type: boolean
+        400: 
+          description: The username was not submitted correctly, can not validate the username.
+  
             
 
 definitions:
@@ -1555,8 +1510,8 @@ definitions:
     description: Latest game data for player.
     type: object
     properties:
-      gameid:
-        type: string
+      game:
+        $ref: "#/definitions/Game"
       launchdatetime:
         type: string
         format: date-time
