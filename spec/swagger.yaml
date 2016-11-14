@@ -5,8 +5,8 @@ info:
     ![Logo](https://scdn.ntgm.rocks/image/OTH/200/auto/igp-logo-dark.png)
     
     
-    Version 2.3.X Of the Site Provider completes the re-engineering of the registration endpoints, introducing
-    dynamic schemas and PlayerRegistration objects.
+    Version 2.4.X Of the Site Provider adds validation endpoints, data endpoints for pulling countries, and currencies, as well as refactoring
+    of the game library to include multimedia endpoints.
     
     ### PlayerSchemas
     
@@ -36,6 +36,14 @@ info:
     For select/multiselect/radio fields values valueLists, and default values are provided. These values are provided
     only as "slugs" for the value portion of the controls, leaving localization up to the consumer. *This should be evaluated in next versions to see if this is the best way to handle localization*
   
+    #### Player/Instant
+    This endpoint is provided to allow you to create a "pre-player" or user account on the backend, which will be flagged as incomplete, and can be followed up
+    by email in case the player abandonds the rest of the registration procedure. 
+    
+    This endpoint is provided as a utility to allow you to create multi-step sign up procedures.
+    
+    ** Players that have only signed up with the instant endpoint will not be able to deposit or spin for money game mode. **
+    
     #### Validators
     
     Field validation logic is handled by returning an array of validators for each field. This will allow consumers, if they wish, to implement the same JavaScript validators that are used on the back end. If not desired, validators 
@@ -199,18 +207,15 @@ paths:
                 items:
                   $ref : "#/definitions/PlayerSchema"
   
-  /player/schema:
+  /player/schemas/{SchemaCode}:
     get:
       tags:
         - Player
         - Registration
       summary: Retrieve a single PlayerProfile by code
       parameters:
-        - name: schemaCode
-          in: query
-          description: The code of the schema to be retrieved
-          required: true
-          type: string
+       - $ref: "#/parameters/SchemaCode"
+          
       responses:
         '200':
           description: Response object
@@ -221,7 +226,6 @@ paths:
                 $ref: "#/definitions/Info"
               data:
                 $ref: "#/definitions/PlayerSchema"
-      
     post:
       tags:
         - Player
@@ -231,20 +235,14 @@ paths:
           See `/player [post] for more information.`
           
           Is an alias for `/validate/player [POST]`
-          
-          
-          
+        
       parameters:
         - name: body
           in: body
           required: true
           schema:
             $ref: '#/definitions/PlayerRegistration'
-        - name: autoLogin
-          in: header
-          type: boolean
-          description: > 
-            Requesting autologin of the player if registration succeeds. If the option is enabled in the site setup, and requested, a valid session id will be returned.
+        - $ref: "#/parameters/SchemaCode"
       responses:
         '201':
           description: Valid input, player created/registered.
@@ -317,7 +315,7 @@ paths:
           schema:
             $ref: '#/definitions/PlayerRegistration'
         - name: autoLogin
-          in: header
+          in: query
           type: boolean
           description: > 
             Requesting autologin of the player if registration succeeds. If the option is enabled in the site setup, and requested, a valid session id will be returned.
@@ -402,7 +400,39 @@ paths:
                 $ref: '#/definitions/Player'
         404:
           $ref: "#/responses/Info"
-                
+    patch:
+      tags:
+        - Player
+      summary: Update  players data with simplified schema.
+      description: >
+       Simplyfied endpoint for updating core player data. For custom and full fields use the /player/full endpoints.
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CorePlayerUpdate'
+      responses:
+        '201':
+          description: Valid input - Player Created
+          headers:
+            'x-sessionid':
+              type: string
+              description: If autologin option was requested, and autologin is enabled for the site, the player's valid `sessionid`.
+          schema:
+            type: object
+            properties:
+              info:
+                type: number
+              data:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+        '400' :
+          $ref: "#/responses/InvalidPlayerdata"
+    
     put:
       tags:
         - Player
@@ -429,6 +459,53 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/CorePlayerInput'
+      responses:
+        '201':
+          description: Valid input - Player Created
+          headers:
+            'x-sessionid':
+              type: string
+              description: If autologin option was requested, and autologin is enabled for the site, the player's valid `sessionid`.
+          schema:
+            type: object
+            properties:
+              info:
+                type: number
+              data:
+                type: object
+                properties:
+                  valid:
+                    type: boolean
+        '400' :
+          $ref: "#/responses/InvalidPlayerdata"
+  /player/instant:
+    post:
+      tags:
+        - Player
+      summary: Create the most simple version of a player, will not be able to deposit or spin until additional data is provided.
+      description: >
+        This allows you to create a "user" which can later be turned into a player by providing additional data. 
+        
+        ** Upon creation, this player will not be able to deposit or spin, until additional data is provided.**
+        
+        This endpoint is envisioned to be used when you want to instantly register a player in a multistep process, and persist their basic data to 
+        the backend to allow automated cart-ababandon type scenarios.
+        
+        
+        
+      parameters:
+        - name: autoLogin
+          in: query
+          description: > 
+            Requesting autologin of the player if registration succeeds. If the option is enabled in the site setup, and requested, a valid session id will be returned.
+          required: false
+          default: false
+          type: boolean
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/InstantPlayerInput'
       responses:
         '201':
           description: Valid input - Player Created
@@ -503,6 +580,7 @@ paths:
               type: boolean
         400: 
           description: The email was not submitted correctly, can not validate the username.  
+  
   /player/favorites:
     head:
       tags:
@@ -1455,37 +1533,26 @@ definitions:
   
   InstantPlayerInput:
     description: >
-      The  basic player data required for a player registration. 
+      The  most basic  player data required for a player creation.
+      
+      **The created player will NOT be able to deposit, withdraw or play with realmoney when creating players with this data**
     type: object
     required:
       - username
       - email
-      - fname
-      - lname
       - password
       - password_confirmation
-      - terms
-      - birthdate
-      - countrycode
+
     properties:
       username:
         type: string
       email:
-        type: string
-      fname:
-        type: string
-      lname:
         type: string
       password:
         type: string
       password_confirmation:
         type: string
         description: Must be the same as the password.
-      terms:
-        type: boolean
-      birthdate:
-        type: string
-        description: YYYY-MM-DD
       countrycode:
         type: string
         description: two letter country code in lowercase
@@ -1533,6 +1600,19 @@ definitions:
       captcha:
         type: string
         
+  CorePlayerUpdate:
+    description: >
+      The  basic player For updating
+    type: object
+    properties:
+      username:
+        type: string
+      email:
+        type: string
+      fname:
+        type: string
+      lname:
+        type: string
 
   Transaction:
     description: Transaction
@@ -2053,6 +2133,12 @@ parameters:
     name: Blue-Session
     in: header
     description: Session key
+    required: true
+    type: string
+  SchemaCode:
+    name: SchemaCode
+    in: path
+    description: A session Code
     required: true
     type: string
   
