@@ -34,8 +34,30 @@ info:
     Field definitions provide information such as required status, JSON dataType, grouping information, and field order.
     
     For select/multiselect/radio fields values valueLists, and default values are provided. These values are provided
-    only as "slugs" for the value portion of the controls, leaving localization up to the consumer. *This should be evaluated in next versions to see if this is the best way to handle localization*
+    only as "slugs" for the value portion of the controls, leaving localization up to the consumer. 
+    
+    
+    *This should be evaluated in next versions to see if this is the best way to handle localization*
   
+    #### Validation
+    
+    Validation is excuted on submitted registration schemas upon submission. You can also test validate a player registration by posting to the `/player/schemas/{ShemaCode}` endpoint.
+    
+    
+    
+    ##### Field Validation
+    Field validation logic is handled by returning an array of validators for each field. This will allow
+    consumers, if they wish, to implement the same JavaScript validators that are used on the back end. 
+    If not desired, validators return slugs of their names for localization. A validator description is
+    also provided for developer use.
+    
+    Individual values can be validated against any available validatory by using the `/validate/{validatorKey}/{value}` endpoint. The HEAD method can be used to optimize speed and minumize network traffi.
+    
+    
+    #### AutoLogin
+    
+    The autologin option and functionality is added, if requested, and enabled on the backend, a valid session ID for the new user will be generated and returned in headers when a new player is registered.
+    
     #### Player/Instant
     This endpoint is provided to allow you to create a "pre-player" or user account on the backend, which will be flagged as incomplete, and can be followed up
     by email in case the player abandonds the rest of the registration procedure. 
@@ -43,17 +65,6 @@ info:
     This endpoint is provided as a utility to allow you to create multi-step sign up procedures.
     
     ** Players that have only signed up with the instant endpoint will not be able to deposit or spin for money game mode. **
-    
-    #### Validators
-    
-    Field validation logic is handled by returning an array of validators for each field. This will allow consumers, if they wish, to implement the same JavaScript validators that are used on the back end. If not desired, validators 
-    return slugs of their names for localization. A validator description is also provided for developer use.
-    
-    TODO: Validator endpoint specification.
-    
-    #### AutoLogin
-    
-    The autologin option and functionality is added, if requested, and enabled on the backend, a valid session ID for the new user will be generated and returned in headers when a new player is registered.
     
     #### PlayerFavorites
     The platform provides storage for player an unlimited number of player favorites.
@@ -69,7 +80,7 @@ info:
     
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
-  version: "2.4.0"
+  version: "2.4.1"
 tags:
   - name: Player
     description: |
@@ -403,7 +414,7 @@ paths:
     patch:
       tags:
         - Player
-      summary: Update  players data with simplified schema.
+      summary: Update players data with simplified schema.
       description: >
        Simplyfied endpoint for updating core player data. For custom and full fields use the /player/full endpoints.
       parameters:
@@ -804,6 +815,10 @@ paths:
       responses:
         200:
           description: OK Ratings found
+          headers:
+            "x-count":
+              type: integer
+              description: Count of ratings for player
           schema:
             type: object
             properties:
@@ -1230,7 +1245,7 @@ paths:
           in: query
           required: true
           type: string
-          description: Return url. In case of error, query param 'error' with description is attached
+          description: Return url.
       responses:
         '200':
           description: Payment url
@@ -1256,7 +1271,7 @@ paths:
   
   
   
-  '/player/cashier/{operation}':
+  '/player/cashier/{operation}/{processor}':
     get:
       tags:
         - Player
@@ -1264,23 +1279,35 @@ paths:
         - Protected
       summary: Get cashier url
       description: >
-        Test credit cards
+        
+        ### Test credit cards:
 
 
-        Credit cards N3DS: 4907639999990022, 5546989999990033, 4775889400000171,
-        4917484589897107,4012000033330026, 5432673003275469
+        #### Credit cards N3DS: 
+        
+        - `4907639999990022`
+        
+        - `5546989999990033`
+        
+        - `4775889400000171`
+        
+        - `4917484589897107`
+        
+        - `4012000033330026`
+        
+        - `5432673003275469`
 
 
-        Credit cards 3DS:
+        #### Credit cards 3DS:
 
-        - 4000000000000002; exp. date = 01/2018
+        - `4000000000000002`; exp. date = 01/2018
 
-        - 5200000000000106; exp. date = 04/2018
+        - `5200000000000106`; exp. date = 04/2018
 
 
         AstropayCard:
 
-        - 1606482490412232; exp. Date = 08/2016, CVV code: 6771
+        - `1606482490412232`; exp. Date = 08/2016, CVV code: 6771
       parameters:
         - name: Blue-Session
           in: header
@@ -1296,7 +1323,7 @@ paths:
             - withdraw
           description: Operations 'deposit' or 'withdrawal'
         - name: processor
-          in: query
+          in: path
           required: true
           type: string
           description: Set to 'piq'
@@ -1318,7 +1345,7 @@ paths:
                 type: string
                 description: Payment url
         '401':
-          $ref: '#/responses/Info'
+          $ref: '#/responses/Error'
  
  
   
@@ -1365,6 +1392,124 @@ paths:
                     type: string
         '401':
           $ref: '#/responses/Info'
+  
+  /validate:
+    get:
+      tags:
+        - Validation
+      summary: > 
+        Get the list of available validators.
+      description: >
+        To use a single field validator, you can call the validator with a GET with the following pattern:
+            
+          `/validate/[validatorKey]/[value]`
+        
+        To retrieve the JS code to use directly on your page you can GET the small
+        .js file using the following pattern.
+        
+          `/validate/js/[validatorKey].js`
+          
+      responses:
+        200:
+          description: >
+            Returns a list of all available validators.
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/Validator"
+        400:
+          $ref: "#/responses/Error"
+  /validate/js/{validatorKey}.js:
+    get:
+      tags:
+        - Validation
+      description: Retrieves the Javascript code which can be used to validate the designated type of data.
+      parameters:
+        - name: validatorKey
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Javascript file
+          schema:
+            type: file
+            format: application/js
+  /validate/{validatorKey}/{value}:
+    get:
+      tags:
+        - Validation
+      summary: > 
+        Validate a value against the passed validator
+      parameters:
+        - name: validatorKey
+          in: path
+          required: true
+          type: string
+        - name: value
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Valid value
+          headers:
+              x-is-valid:
+                description: Is the value valid (false)
+                type: boolean
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        412:
+          description: The value is NOT valued with the passed validator
+          headers:
+              x-is-valid:
+                description: Is the value valid (false)
+                type: boolean
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                $ref: "#/definitions/Validator"
+    head:
+        tags:
+          - Validation
+        summary: > 
+          Validate a value against the passed validator
+        parameters:
+          - name: validatorKey
+            in: path
+            required: true
+            type: string
+          - name: value
+            in: path
+            required: true
+            type: string
+        responses:
+          200:
+            description: Headers only response
+            headers:
+              x-is-valid:
+                description: Is the value valid (true)
+                type: boolean
+          412:
+            description: The value is NOT valued with the passed validator
+            headers:
+              x-is-valid:
+                description: Is the value valid (false)
+                type: boolean
+
+            
+
 definitions:
 
 
@@ -2054,7 +2199,7 @@ definitions:
       isInstant:
         type: boolean
         default: false
-        description: is the deposit instantly credited to the account
+        description: is the transaction instantly credited/debited to the account
       fee:
         type: string
         description: Text decription of the fee.
