@@ -2,9 +2,6 @@
 [![Build Status](https://travis-ci.org/igp-tech/igp-site-provider-doc.svg?branch=master)](https://travis-ci.org/igp-tech/igp-site-provider-doc)
 
 
-![Swagger Valid Status]
-(https://online.swagger.io/validator?url=https://igp-tech.github.io/igp-site-provider-doc/swagger.json)
-
 ![Logo](https://cloud.githubusercontent.com/assets/23325219/20082512/9d16db78-a556-11e6-828d-d22db7cb46f1.png)
 
 ## Links
