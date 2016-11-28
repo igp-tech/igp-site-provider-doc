@@ -100,6 +100,8 @@ tags:
     description: Endpoints for creating and reading player game reviews.
   - name: Validation
     description: Endpoints for validating data
+  - name: Deprecated
+    description: Endpoints that have been put out of production, will not be implemented
 host: dev.pantaloo.com
 schemes:
   - http
@@ -159,9 +161,9 @@ paths:
         - name: play_for_fun
           in: query
           required: false
-          type: string
+          type: boolean
           description: >-
-            By default disabled, set to 1 to enable play for fun mode. Session
+            By default disabled, set to "true" to enable play for fun mode. Session
             header not require if this option is present
         - name: lang
           in: query
@@ -272,11 +274,12 @@ paths:
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
     
-  /player:
+  /player/DEPRECATED:
     head:
       tags:
         - Player
         - Protected
+        - Deprecated
       summary: Check to see if the player session is valid
       description: >
         Returns a valid header if the session which was passed is still active/valid.
@@ -301,6 +304,7 @@ paths:
       tags:
         - Player
         - Protected
+        - Deprecated
       summary: Retrieve a player's profile (flat)
       description: >
         Retrieves core player information based on the players session.
@@ -325,6 +329,7 @@ paths:
     patch:
       tags:
         - Player
+        - Deprecated
       summary: Update players data with simplified schema.
       description: >
        Simplyfied endpoint for updating core player data. For custom and full fields use the /player/full endpoints.
@@ -358,14 +363,13 @@ paths:
     put:
       tags:
         - Player
+        - Deprecated
       summary: Create (register) a simple player
       description: >
         A simplyfied endpoint for registering a player using limited, predifined 
         fields.
         
-        
         **This method provides a simple registration which give you a shortcut to the most basic required fields to create a player. Under most jurisdictions, the player will not be able to deposit, withdraw or play until the required player data has been submitted via the `POST` method.**
-        
         
         **If you wish to use extended/customized fields, use the `POST` method.**
       parameters:
@@ -400,11 +404,33 @@ paths:
                     type: boolean
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
-  /player/full:
+  /player:
+    head:
+      tags:
+        - Player
+        - Protected
+      summary: Check to see if the player session is valid
+      description: >
+        Returns a valid header if the session which was passed is still active/valid.
+      parameters:
+        - name: Blue-Session
+          in: header
+          description: Session key
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Session is Valid
+          headers:
+            "x-valid":
+              type: boolean
+              description: True if valid session.
+        401:
+          $ref: "#/responses/Info"
     get:
       tags:
         - Player
-      summary: Retrieve a player's full profile.
+      summary: Retrieve a player's full profile. ( this was /player/full )
       description: >
         Retrieves all player data, including all custom fields, in the form of fieldInstances.
       parameters:
@@ -428,7 +454,7 @@ paths:
     post:
       tags:
         - Player
-      summary: Create (register) a new player by posting a player schema.
+      summary: Create (register) a new player by posting a player schema.  ( this was /player/full )
       description: >
         The fully featured player register endpoint. This endpoint accepts an array of `fieldInstance`s
 
@@ -473,7 +499,7 @@ paths:
       tags:
         - Player
         - Protected
-      summary: Update a player profile
+      summary: Update a player profile  ( this was /player/full )
       description: >
         Updates (patches) a the profile data for the current session. Only the data
         which needs to be updated should be submitted.
@@ -503,11 +529,12 @@ paths:
                 $ref: '#/definitions/PlayerData'
         404:
           $ref: "#/responses/Info"
-  /player/instant:
+  /player/instant/DEPRECATED:
     post:
       tags:
         - Player
-      summary: Create the most simple version of a player, will not be able to deposit or spin until additional data is provided.
+        - Deprecated
+      summary: Create the most simple version of a player, will not be able to deposit or spin until additional data is provided. ( this was /player/instant, which is incorporated in /player endpoint )
       description: >
         This allows you to create a "user" which can later be turned into a player by providing additional data. 
         
@@ -1066,7 +1093,7 @@ paths:
       tags:
         - Player
         - Auth
-      summary: Request a password reset
+      summary: Request a password reset. Email is to be sent. Token inside email. This API is only returning success/fail.
       parameters:
         - name: body
           in: body
@@ -1084,13 +1111,33 @@ paths:
             properties:
               info:
                 $ref: "#/definitions/Info"
-              data:
-                type: object
-                properties:
-                  token:
-                    type: string
         '401':
           $ref: '#/responses/Info'
+
+  /player/accepttermsofuse:
+    post:
+      tags:
+        - Player
+        - Auth
+        - Protected
+      summary: Marks a player that he accepted terms of use.
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+      responses:
+        '200':
+          description: Accepted use of terms.
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        '401':
+          $ref: '#/responses/Info'
+
   /player/resetpass/{token}:
     post:
       tags:
@@ -1569,7 +1616,7 @@ paths:
                 description: Is the value valid (false)
                 type: boolean
   /validate/player/email/{email}:
-    head:
+    get:
       tags:
         - Player
         - Validation
@@ -1584,19 +1631,27 @@ paths:
       responses:
         200:
           description: OK, submitted email is valid, and can be used for a new player
-          headers:
-            'x-valid':
-              type: boolean
-              
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
         409: 
           description: Invalid, the specificed email can **not** be used for new player registration.
-          headers:
-            'x-valid':
-              type: boolean
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
         400: 
-          description: The email was not submitted correctly, can not validate the username.  
+          description: The email was not submitted correctly, can not validate the username.
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
   /validate/player/username/{username}:
-    head:
+    get:
       tags:
         - Player
         - Validation
@@ -1614,7 +1669,6 @@ paths:
           headers:
             'x-username-valid':
               type: boolean
-              
         409: 
           description: Invalid, the specificed username can **not** be used for new player registration.
           headers:
@@ -1622,7 +1676,7 @@ paths:
               type: boolean
         400: 
           description: The username was not submitted correctly, can not validate the username.
-  
+
 definitions:
 
   PlayerAccount:
@@ -1948,7 +2002,10 @@ definitions:
         description: > 
          The internal system revisionID, which was received from player GET. Submitting the revision id back to the system on update ensures that you will not unknowingly overwrite a concurent request.
         type: integer
-      fieldInstances:
+      corePlayer:
+        items:
+          $ref: "#/definitions/CorePlayerInput"
+      extendedPlayerData:
         type: array
         items:
           $ref: "#/definitions/FieldInstance"
