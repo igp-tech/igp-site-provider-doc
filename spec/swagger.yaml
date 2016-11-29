@@ -273,13 +273,12 @@ paths:
                     type: boolean
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
-    
-  /player/DEPRECATED:
+
+  /player:
     head:
       tags:
         - Player
         - Protected
-        - Deprecated
       summary: Check to see if the player session is valid
       description: >
         Returns a valid header if the session which was passed is still active/valid.
@@ -298,13 +297,11 @@ paths:
               description: True if valid session.
         401:
           $ref: "#/responses/Info"
-    
 
     get:
       tags:
         - Player
         - Protected
-        - Deprecated
       summary: Retrieve a player's profile (flat)
       description: >
         Retrieves core player information based on the players session.
@@ -329,7 +326,6 @@ paths:
     patch:
       tags:
         - Player
-        - Deprecated
       summary: Update players data with simplified schema.
       description: >
        Simplyfied endpoint for updating core player data. For custom and full fields use the /player/full endpoints.
@@ -360,10 +356,9 @@ paths:
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
     
-    put:
+    post:
       tags:
         - Player
-        - Deprecated
       summary: Create (register) a simple player
       description: >
         A simplyfied endpoint for registering a player using limited, predifined 
@@ -404,33 +399,12 @@ paths:
                     type: boolean
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
-  /player:
-    head:
-      tags:
-        - Player
-        - Protected
-      summary: Check to see if the player session is valid
-      description: >
-        Returns a valid header if the session which was passed is still active/valid.
-      parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: true
-          type: string
-      responses:
-        '200':
-          description: Session is Valid
-          headers:
-            "x-valid":
-              type: boolean
-              description: True if valid session.
-        401:
-          $ref: "#/responses/Info"
+
+  /player/extended:
     get:
       tags:
         - Player
-      summary: Retrieve a player's full profile. ( this was /player/full )
+      summary: Retrieve a player's full profile. 
       description: >
         Retrieves all player data, including all custom fields, in the form of fieldInstances.
       parameters:
@@ -454,12 +428,10 @@ paths:
     post:
       tags:
         - Player
-      summary: Create (register) a new player by posting a player schema.  ( this was /player/full )
+      summary: Create (register) a new player by posting a player schema.
       description: >
         The fully featured player register endpoint. This endpoint accepts an array of `fieldInstance`s
 
-          
-          
           **The schema code for the desired PlayerSchema must be provided.**
           
           The sent data will then be validated against the selected schema as well as all core data rules. Upon validation error the response object will contain a list of invalid fields as well as which validation rule or rules were triggered, in order of triggering.
@@ -499,7 +471,7 @@ paths:
       tags:
         - Player
         - Protected
-      summary: Update a player profile  ( this was /player/full )
+      summary: Update a player profile
       description: >
         Updates (patches) a the profile data for the current session. Only the data
         which needs to be updated should be submitted.
@@ -529,7 +501,8 @@ paths:
                 $ref: '#/definitions/PlayerData'
         404:
           $ref: "#/responses/Info"
-  /player/instant/DEPRECATED:
+
+  /player/instant:
     post:
       tags:
         - Player
@@ -577,7 +550,7 @@ paths:
                     type: boolean
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
-  
+
   /player/games:
     head:
       tags:
@@ -932,7 +905,6 @@ paths:
             required: true
             schema:
               $ref : "#/definitions/PlayerRating"  
-          
         responses:
           200:
             description: Rating deleted.
@@ -1055,7 +1027,7 @@ paths:
                 type: string
       responses:
         '200':
-          description: Login successful.
+          description: Login successful. ( should return all that  get player reutnrs  which has a changedTermsOfUser true/false
           schema:
             type: object
             properties:
@@ -1065,6 +1037,7 @@ paths:
                 $ref: '#/definitions/Player'
         '401':
           $ref: '#/responses/Error'
+
   /player/logout:
     get:
       tags:
@@ -1114,13 +1087,13 @@ paths:
         '401':
           $ref: '#/responses/Info'
 
+
   /player/accepttermsofuse:
-    post:
+    get:
       tags:
         - Player
         - Auth
-        - Protected
-      summary: Marks a player that he accepted terms of use.
+      summary: Returns the latest published Terms of use text
       parameters:
         - name: body
           in: body
@@ -1129,12 +1102,45 @@ paths:
             type: object
       responses:
         '200':
-          description: Accepted use of terms.
+          description: Retrieved TOU text
           schema:
             type: object
             properties:
               info:
                 $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  tou:
+                    type: string
+        '401':
+          $ref: '#/responses/Info'
+
+    post:
+      tags:
+        - Player
+        - Auth
+        - Protected
+      summary: Marks a player that he accepted terms of use. In the background, it is written to the player, what version of TC has he accepted.
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+      responses:
+        '200':
+          description: Accepted use of terms. 
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  acceptedVersionOfTerms:
+                    type: number
         '401':
           $ref: '#/responses/Info'
 
@@ -2002,10 +2008,7 @@ definitions:
         description: > 
          The internal system revisionID, which was received from player GET. Submitting the revision id back to the system on update ensures that you will not unknowingly overwrite a concurent request.
         type: integer
-      corePlayer:
-        items:
-          $ref: "#/definitions/CorePlayerInput"
-      extendedPlayerData:
+      fields:
         type: array
         items:
           $ref: "#/definitions/FieldInstance"
@@ -2022,9 +2025,11 @@ definitions:
         * objects
         
         This combination of field name, type and value is termed a FieldInstance.
-    
+
     type: object
     properties:
+      acceptedVersionOfTerms:
+        type: number
       schemaCode:
         $ref: "#/definitions/SchemaCode"
       fieldInstances:
