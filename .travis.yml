@@ -14,7 +14,9 @@ deploy:
       all_branches: true
       condition: '"$TRAVIS_BRANCH" != "master" && "$TRAVIS_BRANCH" != "gh-pages"'
 notifications:
-  slack: autaut:2TOt6Pb3YoUl7lVBD3rCB6m5
+  slack:
+    rooms:
+      - autaut:2TOt6Pb3YoUl7lVBD3rCB6m5
     template:
       - "%{repository} (%{commit}) : %{message} By: %{author}"
       - "%{message}"
