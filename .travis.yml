@@ -15,3 +15,7 @@ deploy:
       condition: '"$TRAVIS_BRANCH" != "master" && "$TRAVIS_BRANCH" != "gh-pages"'
 notifications:
   slack: autaut:2TOt6Pb3YoUl7lVBD3rCB6m5
+    template:
+      - "%{repository} (%{commit}) : %{message} by: %{author}"
+      - "%{message}"
+      - "The new docs are available at: (https://igp-tech.github.io/igp-site-provider-doc/)"
