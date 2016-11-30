@@ -2126,6 +2126,9 @@ definitions:
   FieldInstance:
     description: Base field instance, for which all field instance types are desendant. 
     type: object
+    required:
+      - dataType
+      - code
     properties:
         code:
           type: string
@@ -2142,7 +2145,9 @@ definitions:
         valueArr:
           type: array
           items:
-                type: string
+              type: string
+        valueBool:
+          type: boolean
 
   FieldDef:
     allOf:
@@ -2234,8 +2239,7 @@ definitions:
               - boolean
               - array
               - object
-              - value
-  
+
   Error:
     type: object
     properties:

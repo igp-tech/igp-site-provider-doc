@@ -19,7 +19,7 @@ notifications:
       - autaut:2TOt6Pb3YoUl7lVBD3rCB6m5
     template:
       - "%{repository} (%{commit}) : %{message} By: %{author}"
-      - "%{message}"
+      - "%{commit_message}"
       - "The new docs are available at: (https://igp-tech.github.io/igp-site-provider-doc/)"
 
 
