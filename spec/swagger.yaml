@@ -80,7 +80,7 @@ info:
     
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
-  version: "2.4.6"
+  version: "2.4.7"
 tags:
   - name: Player
     description: |
