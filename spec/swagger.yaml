@@ -80,7 +80,7 @@ info:
     
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
-  version: "2.4.5"
+  version: "2.4.6"
 tags:
   - name: Player
     description: |
@@ -102,6 +102,8 @@ tags:
     description: Endpoints for validating data
   - name: Deprecated
     description: Endpoints that have been put out of production, will not be implemented
+  - name: Terms of Use
+    description : Endpoints related to Terms of Use.
 host: dev.pantaloo.com
 schemes:
   - http
@@ -295,6 +297,9 @@ paths:
             "x-valid":
               type: boolean
               description: True if valid session.
+            "x-tou-valid":
+              type: boolean
+              description: False if the TOU needs to be re-accepted (new version)
         401:
           $ref: "#/responses/Info"
 
@@ -399,7 +404,6 @@ paths:
                     type: boolean
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
-
   /player/extended:
     get:
       tags:
@@ -506,8 +510,7 @@ paths:
     post:
       tags:
         - Player
-        - Deprecated
-      summary: Create the most simple version of a player, will not be able to deposit or spin until additional data is provided. ( this was /player/instant, which is incorporated in /player endpoint )
+      summary: Create the most simple version of a player, will not be able to deposit or spin until additional data is provided.
       description: >
         This allows you to create a "user" which can later be turned into a player by providing additional data. 
         
@@ -515,8 +518,6 @@ paths:
         
         This endpoint is envisioned to be used when you want to instantly register a player in a multistep process, and persist their basic data to 
         the backend to allow automated cart-ababandon type scenarios.
-        
-        
         
       parameters:
         - name: autoLogin
@@ -550,7 +551,36 @@ paths:
                     type: boolean
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
-
+  /player/status:
+    get:
+      tags:
+        - Player
+        - Protected
+      summary: Gets the players current status
+      parameters:
+        - name: Blue-Session
+          in: header
+          description: Session key
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Player status
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  touValid:
+                    description: Has the user accepted the current TOU
+                    type: boolean
+                  
+      
   /player/games:
     head:
       tags:
@@ -1002,7 +1032,7 @@ paths:
         - Auth
       summary: Log a player in to the system.
       description: >
-        Log a player in on to the playtform.
+        Log a player in on to the platform.
         
         
         ### Error Codes
@@ -1027,7 +1057,7 @@ paths:
                 type: string
       responses:
         '200':
-          description: Login successful. ( should return all that  get player reutnrs  which has a changedTermsOfUser true/false
+          description: Login successful.
           schema:
             type: object
             properties:
@@ -1088,12 +1118,11 @@ paths:
           $ref: '#/responses/Info'
 
 
-  /player/accepttermsofuse:
+  /termsofuse:
     get:
       tags:
-        - Player
-        - Auth
-      summary: Returns the latest published Terms of use text
+        - Terms of Use
+      summary: Latest published Terms of Use
       parameters:
         - name: body
           in: body
@@ -1102,7 +1131,7 @@ paths:
             type: object
       responses:
         '200':
-          description: Retrieved TOU text
+          description: Retrieved TOU information
           schema:
             type: object
             properties:
@@ -1111,23 +1140,34 @@ paths:
               data:
                 type: object
                 properties:
-                  tou:
+                  touPlainText:
                     type: string
+                    description: Terms of use text as plain text.
+                  touVersion:
+                    type: integer
+                    description: The version number of the current TOU
         '401':
           $ref: '#/responses/Info'
 
+    
+  /player/termsofuse:  
     post:
       tags:
         - Player
-        - Auth
         - Protected
-      summary: Marks a player that he accepted terms of use. In the background, it is written to the player, what version of TC has he accepted.
+      summary: > 
+          Marks a player that he accepted terms of use. The version of TOU must be sent in payload, to prevent
+          concurrency issues (newly published versions, etc.)
       parameters:
         - name: body
           in: body
           required: true
           schema:
             type: object
+            properties:
+              acceptedVersionOfTerms:
+                type: number
+                
       responses:
         '200':
           description: Accepted use of terms. 
@@ -1925,7 +1965,7 @@ definitions:
       - lname
       - password
       - password_confirmation
-      - terms
+      - acceptedVersionOfTerms
       - birthdate
       - countrycode
     properties:
@@ -1942,8 +1982,9 @@ definitions:
       password_confirmation:
         type: string
         description: Must be the same as the password.
-      terms:
-        type: boolean
+      acceptedVersionOfTerms:
+        type: integer
+        description: The version number of the Terms of Use which was accepted.
       birthdate:
         type: string
         description: YYYY-MM-DD
