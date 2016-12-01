@@ -80,7 +80,7 @@ info:
     
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
-  version: "2.4.7"
+  version: "2.4.8"
 tags:
   - name: Player
     description: |
@@ -1118,17 +1118,50 @@ paths:
           $ref: '#/responses/Info'
 
 
-  /termsofuse:
+  /termsofuse/:
+    get:
+      tags:
+        - Terms of Use
+      summary: Retrieves latest TOU text, in all avail languages.
+      responses:
+        '200':
+          description: Retrieved TOU information
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                    type: object
+                    properties:
+                      langCode:
+                        type: string
+                        description: Two letter ISO language code
+                      touPlainText:
+                        type: string
+                        description: Terms of use text as plain text.
+                      touVersion:
+                        type: integer
+                        description: The version number of the current TOU
+        '401':
+          $ref: '#/responses/Info'
+          
+  /termsofuse/{langCode}:
     get:
       tags:
         - Terms of Use
       summary: Latest published Terms of Use
       parameters:
-        - name: body
-          in: body
+        - name: langCode
+          in: path
           required: true
-          schema:
-            type: object
+          type: string
+          maxLength : 2
+          minLength : 2
+          description: Two letter ISO language code to return to TOC.
+            
       responses:
         '200':
           description: Retrieved TOU information
