@@ -80,7 +80,7 @@ info:
     
     
     Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
-  version: "2.4.9"
+  version: "2.4.10"
 tags:
   - name: Player
     description: |
@@ -270,7 +270,41 @@ paths:
                     type: boolean
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
-
+  /captcha:
+    get:
+      summary: Get captcha image
+      tags:
+        - Player
+      description: Registration captcha
+      produces:
+        - image/png
+      parameters:
+        - name: session
+          in: query
+          type: string
+          required: true
+          description: user session (returned by GET /player)
+        - name: width
+          in: query
+          type: number
+          required: false
+          description: image width (default 90px) 
+        - name: height
+          in: query
+          type: number
+          required: false
+          description: image width (default 30px) 
+        - name: background
+          in: query
+          type: string
+          required: false
+          description: background color (default ffffff - white)
+      responses:
+        200:
+          description: Captcha image
+          schema:
+            type: string
+            format: byte
   /player:
     head:
       tags:
