@@ -150,11 +150,7 @@ paths:
         - Protected
       summary: Get a single game
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: false
-          type: string
+        - $ref: "#/parameters/Session"
         - name: id
           in: path
           required: true
@@ -228,7 +224,6 @@ paths:
       summary: Retrieve a single PlayerProfile by code
       parameters:
        - $ref: "#/parameters/SchemaCode"
-          
       responses:
         '200':
           description: Response object
@@ -285,11 +280,7 @@ paths:
       description: >
         Returns a valid header if the session which was passed is still active/valid.
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: true
-          type: string
+        - $ref: "#/parameters/Session"
       responses:
         '200':
           description: Session is Valid
@@ -311,11 +302,7 @@ paths:
       description: >
         Retrieves core player information based on the players session.
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: true
-          type: string
+        - $ref: "#/parameters/Session"
       responses:
         '200':
           description: Valid input
@@ -343,11 +330,7 @@ paths:
             $ref: '#/definitions/CorePlayerUpdate'
       responses:
         '201':
-          description: Valid input - Player Created
-          headers:
-            'x-sessionid':
-              type: string
-              description: If autologin option was requested, and autologin is enabled for the site, the player's valid `sessionid`.
+          description: Valid input - Player updated
           schema:
             type: object
             properties:
@@ -396,12 +379,9 @@ paths:
             type: object
             properties:
               info:
-                type: number
+                $ref: "#/definitions/Info"
               data:
-                type: object
-                properties:
-                  valid:
-                    type: boolean
+                $ref: '#/definitions/Player'
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
   /player/extended:
@@ -412,11 +392,7 @@ paths:
       description: >
         Retrieves all player data, including all custom fields, in the form of fieldInstances.
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: true
-          type: string
+        - $ref: "#/parameters/Session"
       responses:
         '200':
           description: Valid input
@@ -482,11 +458,7 @@ paths:
         
         Data is submitted using `fieldInstances` in  a similar manner to `[POST] /player/full` with arrays of `fieldInstances[Str|Num|Arr|Obj]` in the appropriate property. 
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: true
-          type: string
+        - $ref: "#/parameters/Session"
         - name: body
           in: body
           required: true
@@ -558,11 +530,7 @@ paths:
         - Protected
       summary: Gets the players current status
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: true
-          type: string
+        - $ref: "#/parameters/Session"
       responses:
         '200':
           description: Player status
@@ -592,11 +560,7 @@ paths:
         
         Filters the game library based upon the logged in player's country and currency settings. Also will filter by the players current IP address for providers who do not allow play in certail countries.
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: false
-          type: string
+        - $ref: "#/parameters/Session"
       responses:
         '200':
           description: Response headers
@@ -613,11 +577,7 @@ paths:
       description: >
         Filters the game library based upon the logged in player's country and currency settings. Also will filter by the players current IP address for providers who do not allow play in certail countries.
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: false
-          type: string
+        - $ref: "#/parameters/Session"
       responses:
         '200':
           description: Response object
@@ -995,11 +955,7 @@ paths:
     get:
       summary: Get player game transactions
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: true
-          type: string
+        - $ref: "#/parameters/Session"
         - name: from
           in: query
           required: false
@@ -1076,11 +1032,7 @@ paths:
         - Protected
       summary: Player logout
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: true
-          type: string
+        - $ref: "#/parameters/Session"
       responses:
         '204':
           schema:
@@ -1261,11 +1213,7 @@ paths:
         - Protected
       summary: Player balance
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: true
-          type: string
+        - $ref: "#/parameters/Session"
       responses:
         '200':
           description: Player balance
@@ -1299,11 +1247,7 @@ paths:
         - Protected
       summary: Get players transactions
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: true
-          type: string
+        - $ref: "#/parameters/Session"
         - name: from
           in: query
           required: false
@@ -1336,11 +1280,7 @@ paths:
          - Protected
       summary: 'Get messages for player ( deposit/withdraw confirations, Errors)'
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: true
-          type: string
+        - $ref: "#/parameters/Session"
       responses:
         '200':
           description: Response object
@@ -1373,11 +1313,7 @@ paths:
         Lists all available deposit and withdraw methods for the active player
         with urls to deposit/withdraw forms
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: false
-          type: string
+        - $ref: "#/parameters/Session"
         - name: transtype
           in: path
           required: true
@@ -1450,11 +1386,7 @@ paths:
 
         - `1606482490412232`; exp. Date = 08/2016, CVV code: 6771
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: false
-          type: string
+        - $ref: "#/parameters/Session"
         - name: operation
           in: path
           required: true
@@ -1499,11 +1431,7 @@ paths:
         can be used to implement quick payment functionality by sending accountIds
         instead of card information when excecuting transactions.
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key
-          required: true
-          type: string
+        - $ref: "#/parameters/Session"
         - name: type
           in: query
           description: Only returns the passed account type if passed.
@@ -1544,11 +1472,7 @@ paths:
         - Protected
       summary: Player iframe pages
       parameters:
-        - name: Blue-Session
-          in: header
-          description: Session key (not required for register page)
-          required: false
-          type: string
+        - $ref: "#/parameters/Session"
         - name: page
           in: path
           required: true
@@ -1914,15 +1838,9 @@ definitions:
         type: string
       terms:
         type: boolean
-      ref_code:
-        type: string
-        description: (optional) create player under some subagent
       newsletter:
         type: boolean
         description: (optional)
-      currency:
-        type: string
-        description: required only if multicurrency enabled
       gender:
         type: string
         description: (optional)
@@ -1951,7 +1869,7 @@ definitions:
         type: string
         description: language locale code
         example: 
-          -  en_GB
+          - en_GB
           - it_IT
       sessionid:
         type: string
@@ -2492,6 +2410,7 @@ responses:
                   type: array
                   items:
                     $ref: "#/definitions/Error"
+            
                 fields:
                   description: an array of invalid fields, with an array of the invalid validators.
                   type: array
@@ -2503,10 +2422,12 @@ responses:
     description: Error Information
     schema:
       $ref: "#/definitions/Info"
+
   AuthError:
     description: Authorization error, resource not available for this session or apiKey
     schema:
       $ref: "#/definitions/Info"
+      
   Info:
     description: Basic information
     schema:
@@ -2527,9 +2448,9 @@ responses:
             format: float
 parameters:
   Session:
-    name: Blue-Session
+    name: x-igp-session
     in: header
-    description: Session key
+    description: IGP session key
     required: true
     type: string
   SchemaCode:
@@ -2538,5 +2459,3 @@ parameters:
     description: A session Code
     required: true
     type: string
-  
-      
