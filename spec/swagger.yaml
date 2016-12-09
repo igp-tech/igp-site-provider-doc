@@ -1027,10 +1027,10 @@ paths:
         ### Error Codes
           If the login was not successfull (401), `resultCode` indicate what the error on login was:
            
-          * Password Missing
-          * Username missing
-          * Invalid Username or Password
-          * Player not active (correct password, but the player is not allowed to login)
+          * Password missing (missing_password)
+          * Username missing (missing_username)
+          * Invalid Username or Password (invalid_username_or_password)
+          * Player not active (correct password, but the player is not allowed to login) (system_error, with the message)
             
             
       parameters:
