@@ -1230,8 +1230,8 @@ paths:
             properties:
               info:
                 $ref: "#/definitions/Info"
-        '404':
-          $ref: '#/responses/Info'
+        '400':
+          $ref: "#/responses/InvalidPlayerdata"
   
   /player/balance:
     get:
