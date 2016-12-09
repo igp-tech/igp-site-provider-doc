@@ -575,8 +575,9 @@ paths:
               data:
                 type: object
                 properties:
-                  status:
-                    type: string
+                  sessionValid:
+                    description: Is the session valid
+                    type: boolean
                   touValid:
                     description: Has the user accepted the current TOU
                     type: boolean
@@ -1493,7 +1494,7 @@ paths:
         400:
           description: Error
       
-  /player/page/{page}:
+  /player/page/{page}: 
     get:
       tags:
         - Player
