@@ -1230,11 +1230,6 @@ paths:
             properties:
               info:
                 $ref: "#/definitions/Info"
-              data:
-                type: object
-                properties:
-                  reset:
-                    type: boolean
         '404':
           $ref: '#/responses/Info'
   
