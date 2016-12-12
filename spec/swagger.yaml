@@ -148,7 +148,7 @@ paths:
       tags:
         - Game Library
         - Protected
-      summary: Get a single game
+      summary: Get game
       parameters:
         - $ref: "#/parameters/Session"
         - name: id
@@ -183,7 +183,14 @@ paths:
               info:
                 $ref: "#/definitions/Info"
               data:
-                $ref: '#/definitions/Game'
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: Game url
+                  system:
+                    type: string
+                    description: System code (ne, gs, ...)
         '400':
           $ref: '#/responses/Info'
         401:
