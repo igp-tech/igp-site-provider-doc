@@ -1500,6 +1500,7 @@ paths:
         - Player
         - Cashier
         - Protected
+        - Deprecated
       summary: Player iframe pages
       parameters:
         - $ref: "#/parameters/Session"
