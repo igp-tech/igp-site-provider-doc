@@ -147,33 +147,13 @@ paths:
     get:
       tags:
         - Game Library
-        - Protected
-      summary: Get game
+      summary: Get a single game
       parameters:
-        - $ref: "#/parameters/Session"
         - name: id
           in: path
           required: true
           type: string
           description: Game id
-        - name: play_for_fun
-          in: query
-          required: false
-          type: boolean
-          description: >-
-            By default disabled, set to "true" to enable play for fun mode. Session
-            header not require if this option is present
-        - name: lang
-          in: query
-          required: false
-          type: string
-          default : en
-          description: Default 'en'
-        - name: homeurl
-          in: query
-          required: false
-          type: string
-          description: Home url or return url. All games may not support this, usually for mobile ones
       responses:
         '200':
           description: Game
@@ -183,19 +163,9 @@ paths:
               info:
                 $ref: "#/definitions/Info"
               data:
-                type: object
-                properties:
-                  url:
-                    type: string
-                    description: Game url
-                  system:
-                    type: string
-                    description: System code (ne, gs, ...)
+                $ref: '#/definitions/Game'
         '400':
           $ref: '#/responses/Info'
-        401:
-          $ref: "#/responses/AuthError"
-
   /player/schemas:
     get:
       tags:
