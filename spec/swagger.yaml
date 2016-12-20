@@ -465,7 +465,7 @@ paths:
                 $ref: '#/definitions/PlayerData'
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
-          
+
     patch:
       tags:
         - Player
@@ -483,7 +483,7 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/PlayerData'
-          
+
       responses:
         '200':
           description: Valid input
@@ -494,8 +494,10 @@ paths:
                 $ref: "#/definitions/Info"
               data:
                 $ref: '#/definitions/PlayerData'
-        404:
+        '404':
           $ref: "#/responses/Info"
+        '400' :
+          $ref: "#/responses/InvalidPlayerdata"
 
   /player/instant:
     post:
