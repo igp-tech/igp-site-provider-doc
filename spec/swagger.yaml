@@ -412,7 +412,7 @@ paths:
         - Player
       summary: Retrieve a player's full profile. 
       description: >
-        Retrieves all player data, including all custom fields, in the form of fieldInstances.
+        Retrieves all player data, including all custom fields, in the form of fields ( fieldInstances ).
       parameters:
         - $ref: "#/parameters/Session"
       responses:
@@ -432,7 +432,7 @@ paths:
         - Player
       summary: Create (register) a new player by posting a player schema.
       description: >
-        The fully featured player register endpoint. This endpoint accepts an array of `fieldInstance`s
+        The fully featured player register endpoint. This endpoint accepts an array of fields ( former `fieldInstance`s ) 
 
           **The schema code for the desired PlayerSchema must be provided.**
           
@@ -475,7 +475,7 @@ paths:
         Updates (patches) a the profile data for the current session. Only the data
         which needs to be updated should be submitted.
         
-        Data is submitted using `fieldInstances` in  a similar manner to `[POST] /player/full` with arrays of `fieldInstances[Str|Num|Arr|Obj]` in the appropriate property. 
+        Data is submitted using 'fields' (`fieldInstances`) in  a similar manner to `[POST] /player/full` with arrays of `fields[Str|Num|Arr|Obj]` in the appropriate property. 
       parameters:
         - $ref: "#/parameters/Session"
         - name: body
@@ -2073,7 +2073,7 @@ definitions:
       fields:
         type: array
         items:
-          $ref: "#/definitions/FieldInstance"
+          $ref: "#/definitions/Field"
   
   PlayerRegistration:
     description: |
@@ -2086,7 +2086,7 @@ definitions:
         * arrays
         * objects
         
-        This combination of field name, type and value is termed a FieldInstance.
+        This combination of field name, type and value is termed a Field ( former FieldInstance ) .
 
     type: object
     properties:
@@ -2094,10 +2094,10 @@ definitions:
         type: number
       schemaCode:
         $ref: "#/definitions/SchemaCode"
-      fieldInstances:
+      fields:
         type: array
         items:
-          $ref: "#/definitions/FieldInstance"
+          $ref: "#/definitions/Field"
   
   PlayerSchema:
     type: object
@@ -2123,7 +2123,7 @@ definitions:
   
   Field:
     type: object
-    description: Base definition of a field, which is then either a FieldInstance, or a FieldDefinition.
+    description: Base definition of a field, which is then either a Field ( FieldInstance ), or a FieldDefinition.
     required:
       - code
     properties:
@@ -2144,7 +2144,7 @@ definitions:
             $ref: "#/definitions/Validator"
 
       
-  FieldInstance:
+  Field:
     description: Base field instance, for which all field instance types are desendant. 
     type: object
     required:
