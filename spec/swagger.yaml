@@ -280,8 +280,17 @@ paths:
         200:
           description: Captcha image
           schema:
-            type: string
-            format: byte
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  imgSrc:
+                    type: string
+                    description: base64 encoded captcha image you can put into <img src=""/>
+
   /player:
     head:
       tags:
