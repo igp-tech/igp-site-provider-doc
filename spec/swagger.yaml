@@ -1071,7 +1071,11 @@ paths:
           * Username missing (missing_username)
           * Invalid Username or Password (invalid_username_or_password)
           * Player not active (correct password, but the player is not allowed to login) (system_error, with the message)
-            
+          * Your account is blocked. (account_blocked)
+          * Your account was deactivated by your own request. (account_deactivated)
+          * Your account temporary is frozen (account_frozen)
+          * Activation requirements not complete (account_pending)
+          * Account is not activated (account_unactivated)
             
       parameters:
         - name: body
