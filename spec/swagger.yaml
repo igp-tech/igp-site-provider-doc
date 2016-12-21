@@ -253,14 +253,12 @@ paths:
       tags:
         - Player
       description: Registration captcha
-      produces:
-        - image/png
       parameters:
-        - name: session
-          in: query
-          type: string
-          required: true
+        - name: x-igp-session
+          in: header
           description: user session (returned by GET /player)
+          required: true
+          type: string
         - name: width
           in: query
           type: number
