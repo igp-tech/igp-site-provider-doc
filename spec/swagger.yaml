@@ -1227,7 +1227,7 @@ paths:
           schema:
             type: object
             properties:
-              acceptedVersionOfTerms:
+              terms:
                 type: number
                 
       responses:
@@ -1241,7 +1241,7 @@ paths:
               data:
                 type: object
                 properties:
-                  acceptedVersionOfTerms:
+                  terms:
                     type: number
         '401':
           $ref: '#/responses/Info'
@@ -1899,7 +1899,7 @@ definitions:
       - lname
       - terms
     properties:
-      revId:
+      version:
         type: integer
         description: the internal system revision id. Must be submitted with patch.
       username:
@@ -1959,7 +1959,7 @@ definitions:
       - username
       - email
       - password
-      - password_confirmation
+      - password_confirm
 
     properties:
       username:
@@ -1968,7 +1968,7 @@ definitions:
         type: string
       password:
         type: string
-      password_confirmation:
+      password_confirm:
         type: string
         description: Must be the same as the password.
       countrycode:
@@ -1989,8 +1989,8 @@ definitions:
       - fname
       - lname
       - password
-      - password_confirmation
-      - acceptedVersionOfTerms
+      - password_confirm
+      - terms
       - birthdate
       - countrycode
     properties:
@@ -2004,10 +2004,10 @@ definitions:
         type: string
       password:
         type: string
-      password_confirmation:
+      password_confirm:
         type: string
         description: Must be the same as the password.
-      acceptedVersionOfTerms:
+      terms:
         type: integer
         description: The version number of the Terms of Use which was accepted.
       birthdate:
@@ -2068,9 +2068,9 @@ definitions:
       Object for submitting updates to player profile data. Similar to `PlayerRegistration`, but it is hardcoded to the PlayerProfile schema.
     type: object
     required:
-      - revId
+      - version
     properties:
-      revId:
+      version:
         description: > 
          The internal system revisionID, which was received from player GET. Submitting the revision id back to the system on update ensures that you will not unknowingly overwrite a concurent request.
         type: integer
@@ -2094,7 +2094,7 @@ definitions:
 
     type: object
     properties:
-      acceptedVersionOfTerms:
+      terms:
         type: number
       schemaCode:
         $ref: "#/definitions/SchemaCode"
