@@ -231,10 +231,6 @@ paths:
       responses:
         '201':
           description: Valid input, player created/registered.
-          headers:
-            'Blue-session':
-              type: string
-              description: If autologin option was requested, and autologin is enabled for the site, the player's valid `sessionid`.
           schema:
             type: object
             properties:
@@ -450,10 +446,6 @@ paths:
       responses:
         '201':
           description: Valid input, player created/registered.
-          headers:
-            'Blue-Session':
-              type: string
-              description: If autologin option was requested, and autologin is enabled for the site, the player's valid `sessionid`.
           schema:
             type: object
             properties:
