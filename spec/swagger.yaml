@@ -78,8 +78,26 @@ info:
     #### PlayerLatests
     As part of TotalTelemetry the system provides endpoints to retrive a players latest game launches.
     
-    
-    Add "lang" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)
+    #### General result codes (resultCode):
+
+      * success - operation completed successfuly
+      * unauthorized - unauthorized request
+      * invalid_username_or_password - invalid username or password
+      * invalid_version - updating invalid version
+      * session_expired - player session expired
+      * page_not_found - page do not exists
+      * game_not_found - game do not exists
+      * missing_version - missing version
+      * missing_username - missing username
+      * missing_password - missing password
+      * payment_processor_error - payment processor error
+      * payment_processor_invalid_parameters - invalid input parameters
+      * account_blocked - player account is blocked
+      * account_deactivated - player account was deactivated by their request
+      * account_frozen - player account is temporary frozen
+      * account_pending - player activation not complete
+      * account_unactivated - player account is not activated
+
   version: "2.4.10"
 tags:
   - name: Player
@@ -1062,7 +1080,6 @@ paths:
           * Password missing (missing_password)
           * Username missing (missing_username)
           * Invalid Username or Password (invalid_username_or_password)
-          * Player not active (correct password, but the player is not allowed to login) (system_error, with the message)
           * Your account is blocked. (account_blocked)
           * Your account was deactivated by your own request. (account_deactivated)
           * Your account temporary is frozen (account_frozen)
