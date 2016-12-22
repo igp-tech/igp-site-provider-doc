@@ -2030,17 +2030,37 @@ definitions:
         
   CorePlayerUpdate:
     description: >
-      The  basic player For updating
+      Updatable player data
     type: object
     properties:
-      username:
-        type: string
       email:
         type: string
-      fname:
+      password:
         type: string
-      lname:
+      password_confirm:
         type: string
+        description: required if password is set
+      countrycode:
+        type: string
+        description: two letter lowercase country code
+      languagecode:
+        type: string
+        description: language locale code
+        example:
+          - en_GB
+          - it_IT
+      address:
+        type: string
+      city:
+        type: string
+      zip:
+        type: string
+      phone:
+        type: string
+      mobile:
+        type: string
+      newsletter:
+        type: boolean
 
   Transaction:
     description: Transaction
