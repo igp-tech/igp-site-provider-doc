@@ -82,11 +82,17 @@ info:
 
       * success - operation completed successfuly
       * unauthorized - unauthorized request
+      * session_expired - player session expired
+
+    #### Other request specific result codes (resultCode):
+
+      * invalid_input - invalid input
       * invalid_username_or_password - invalid username or password
       * invalid_version - updating invalid version
-      * session_expired - player session expired
       * page_not_found - page do not exists
       * game_not_found - game do not exists
+      * missing_email - missing email
+      * missing_input - missing input
       * missing_version - missing version
       * missing_username - missing username
       * missing_password - missing password
@@ -353,6 +359,8 @@ paths:
       summary: Update players data with simplified schema.
       description: >
        Simplyfied endpoint for updating core player data. For custom and full fields use the /player/full endpoints.
+
+       ### Possible error codes (resultCode): invalid_input
       parameters:
         - $ref: "#/parameters/Session"
         - name: body
@@ -389,6 +397,9 @@ paths:
         sessionid in response (in data and in header) is only returned if autologin is requested, and allowed.
         
         **If you wish to use extended/customized fields, use the `POST` method.**
+
+        ### Possible error codes (resultCode): invalid_input
+
       parameters:
         - name: autoLogin
           in: header
@@ -449,7 +460,7 @@ paths:
           **The schema code for the desired PlayerSchema must be provided.**
           
           The sent data will then be validated against the selected schema as well as all core data rules. Upon validation error the response object will contain a list of invalid fields as well as which validation rule or rules were triggered, in order of triggering.
-        
+        ### Possible error codes (resultCode): invalid_input
       parameters:
         - name: body
           in: body
@@ -483,7 +494,9 @@ paths:
         Updates (patches) a the profile data for the current session. Only the data
         which needs to be updated should be submitted.
         
-        Data is submitted using `fieldInstances` in  a similar manner to `[POST] /player/full` with arrays of `fieldInstances[Str|Num|Arr|Obj]` in the appropriate property. 
+        Data is submitted using `fieldInstances` in  a similar manner to `[POST] /player/full` with arrays of `fieldInstances[Str|Num|Arr|Obj]` in the appropriate property.
+
+        ### Possible error codes (resultCode): invalid_input
       parameters:
         - $ref: "#/parameters/Session"
         - name: body
@@ -585,6 +598,8 @@ paths:
           - Game Library
           - Protected
         summary: Get game
+        description: >
+          ### Possible error codes (resultCode): game_not_found
         parameters:
           - $ref: "#/parameters/Session"
           - name: id
@@ -1074,17 +1089,7 @@ paths:
         Log a player in on to the platform.
         
         
-        ### Error Codes
-          If the login was not successfull (401), `resultCode` indicate what the error on login was:
-           
-          * Password missing (missing_password)
-          * Username missing (missing_username)
-          * Invalid Username or Password (invalid_username_or_password)
-          * Your account is blocked. (account_blocked)
-          * Your account was deactivated by your own request. (account_deactivated)
-          * Your account temporary is frozen (account_frozen)
-          * Activation requirements not complete (account_pending)
-          * Account is not activated (account_unactivated)
+        ### Possible error codes (resultCode): missing_password, missing_username, invalid_username_or_password, account_blocked, account_deactivated, account_frozen, account_pending, account_unactivated
             
       parameters:
         - name: body
@@ -1134,7 +1139,10 @@ paths:
       tags:
         - Player
         - Auth
-      summary: Request a password reset. Email is to be sent. Token inside email. This API is only returning success/fail.
+      summary: >
+        Request a password reset. Email is to be sent. Token inside email. This API is only returning success/fail.
+      description: >
+        ### Possible error codes (resultCode): missing_email
       parameters:
         - name: body
           in: body
@@ -1229,6 +1237,8 @@ paths:
       summary: > 
           Marks a player that he accepted terms of use. The version of TOU must be sent in payload, to prevent
           concurrency issues (newly published versions, etc.)
+      description: >
+        ### Possible error codes (resultCode): missing_version, invalid_version
       parameters:
         - name: body
           in: body
@@ -1262,6 +1272,8 @@ paths:
         - Auth
         - Protected
       summary: Reset a players password
+      description: >
+        ### Possible error codes (resultCode): missing_password, invalid_input
       parameters:
         - name: token
           in: path
@@ -1394,6 +1406,8 @@ paths:
       description: >
         Lists all available deposit and withdraw methods for the active player
         with urls to deposit/withdraw forms
+
+        ### Possible error codes (resultCode): payment_processor_invalid_parameters
       parameters:
         - $ref: "#/parameters/Session"
         - name: transtype
@@ -1467,6 +1481,9 @@ paths:
         AstropayCard:
 
         - `1606482490412232`; exp. Date = 08/2016, CVV code: 6771
+
+
+        ### Possible error codes (resultCode): payment_processor_error, payment_processor_invalid_parameters
       parameters:
         - $ref: "#/parameters/Session"
         - name: operation
@@ -1512,6 +1529,9 @@ paths:
         Retrieves all accounts for the player. These accounts, with their ids,
         can be used to implement quick payment functionality by sending accountIds
         instead of card information when excecuting transactions.
+
+        ### Possible error codes (resultCode): payment_processor_error, payment_processor_invalid_parameters
+
       parameters:
         - $ref: "#/parameters/Session"
         - name: type
@@ -1554,6 +1574,8 @@ paths:
         - Protected
         - Deprecated
       summary: Player iframe pages
+      description:
+        ### Possible error codes (resultCode): page_not_found
       parameters:
         - $ref: "#/parameters/Session"
         - name: page
@@ -1709,6 +1731,7 @@ paths:
       summary: Check the validity of a email
       description: >
         Checks the submitted email to see if is valid for a new user for the site. Checks duplicates and email validity.
+        ### Possible error codes (resultCode): invalid_input
       parameters:
         - name: email
           in: path
@@ -1744,6 +1767,7 @@ paths:
       summary: Check the validity of a username
       description: >
         Checks the submitted username to see if is valid for a new user for the site. Checks duplicates and username standards.
+        ### Possible error codes (resultCode): invalid_input
       parameters:
         - name: username
           in: path
