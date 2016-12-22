@@ -565,6 +565,32 @@ paths:
                     type: boolean
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
+  /anon:
+    get:
+      summary: Get/start anonymous session
+      description: >
+        Required for captcha validation/registration process
+      parameters:
+        - name: x-igp-session
+          in: header
+          description: If provided request will just create/update provided session
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Anonymous session
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  sessionId:
+                    description: Session id
+                    type: string
+
   /player/status:
     get:
       tags:
