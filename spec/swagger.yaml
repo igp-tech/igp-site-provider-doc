@@ -358,9 +358,9 @@ paths:
         - Player
       summary: Update players data with simplified schema.
       description: >
-       Simplyfied endpoint for updating core player data. For custom and full fields use the /player/full endpoints.
-
-       ### Possible error codes (resultCode): invalid_input
+       Simplyfied endpoint for updating core player data. For custom and full fields use the /player/full endpoints. 
+       
+       Possible error codes (resultCode): invalid_input
       parameters:
         - $ref: "#/parameters/Session"
         - name: body
@@ -398,7 +398,7 @@ paths:
         
         **If you wish to use extended/customized fields, use the `POST` method.**
 
-        ### Possible error codes (resultCode): invalid_input
+        Possible error codes (resultCode): invalid_input
 
       parameters:
         - name: autoLogin
@@ -460,7 +460,8 @@ paths:
           **The schema code for the desired PlayerSchema must be provided.**
           
           The sent data will then be validated against the selected schema as well as all core data rules. Upon validation error the response object will contain a list of invalid fields as well as which validation rule or rules were triggered, in order of triggering.
-        ### Possible error codes (resultCode): invalid_input
+          
+          Possible error codes (resultCode): invalid_input
       parameters:
         - name: body
           in: body
@@ -495,8 +496,8 @@ paths:
         which needs to be updated should be submitted.
         
         Data is submitted using `fieldInstances` in  a similar manner to `[POST] /player/full` with arrays of `fieldInstances[Str|Num|Arr|Obj]` in the appropriate property.
-
-        ### Possible error codes (resultCode): invalid_input
+        
+        Possible error codes (resultCode): invalid_input
       parameters:
         - $ref: "#/parameters/Session"
         - name: body
@@ -625,7 +626,7 @@ paths:
           - Protected
         summary: Get game
         description: >
-          ### Possible error codes (resultCode): game_not_found
+          Possible error codes (resultCode): game_not_found
         parameters:
           - $ref: "#/parameters/Session"
           - name: id
@@ -1114,8 +1115,7 @@ paths:
       description: >
         Log a player in on to the platform.
         
-        
-        ### Possible error codes (resultCode): missing_password, missing_username, invalid_username_or_password, account_blocked, account_deactivated, account_frozen, account_pending, account_unactivated
+        Possible error codes (resultCode): missing_password, missing_username, invalid_username_or_password, account_blocked, account_deactivated, account_frozen, account_pending, account_unactivated
             
       parameters:
         - name: body
@@ -1168,7 +1168,7 @@ paths:
       summary: >
         Request a password reset. Email is to be sent. Token inside email. This API is only returning success/fail.
       description: >
-        ### Possible error codes (resultCode): missing_email
+        Possible error codes (resultCode): missing_email
       parameters:
         - name: body
           in: body
@@ -1264,7 +1264,7 @@ paths:
           Marks a player that he accepted terms of use. The version of TOU must be sent in payload, to prevent
           concurrency issues (newly published versions, etc.)
       description: >
-        ### Possible error codes (resultCode): missing_version, invalid_version
+        Possible error codes (resultCode): missing_version, invalid_version
       parameters:
         - name: body
           in: body
@@ -1299,7 +1299,7 @@ paths:
         - Protected
       summary: Reset a players password
       description: >
-        ### Possible error codes (resultCode): missing_password, invalid_input
+        #Possible error codes (resultCode): missing_password, invalid_input
       parameters:
         - name: token
           in: path
@@ -1600,8 +1600,8 @@ paths:
         - Protected
         - Deprecated
       summary: Player iframe pages
-      description:
-        ### Possible error codes (resultCode): page_not_found
+      description: >
+        Possible error codes (resultCode): page_not_found
       parameters:
         - $ref: "#/parameters/Session"
         - name: page
