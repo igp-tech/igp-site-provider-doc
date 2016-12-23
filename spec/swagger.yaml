@@ -401,8 +401,8 @@ paths:
         Possible error codes (resultCode): invalid_input
 
       parameters:
-        - name: autoLogin
-          in: header
+        - name: autologin
+          in: query
           description: > 
             Requesting autologin of the player if registration succeeds. If the option is enabled in the site setup, and requested, a valid session id will be returned.
           required: false
@@ -468,7 +468,7 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/PlayerRegistration'
-        - name: autoLogin
+        - name: autologin
           in: query
           type: boolean
           description: > 
@@ -535,7 +535,7 @@ paths:
         the backend to allow automated cart-ababandon type scenarios.
         
       parameters:
-        - name: autoLogin
+        - name: autologin
           in: query
           description: > 
             Requesting autologin of the player if registration succeeds. If the option is enabled in the site setup, and requested, a valid session id will be returned.
