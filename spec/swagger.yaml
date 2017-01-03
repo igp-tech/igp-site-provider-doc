@@ -138,6 +138,7 @@ paths:
   /games:
     head:
       tags:
+        - Unimplemented
         - Game Library
       summary: Get the count of games available on site.
       responses:
@@ -314,6 +315,7 @@ paths:
       tags:
         - Player
         - Protected
+        - Unimplemented
       summary: Check to see if the player session is valid
       description: >
         Returns a valid header if the session which was passed is still active/valid.
@@ -525,6 +527,7 @@ paths:
     post:
       tags:
         - Player
+        - Unimplemented
       summary: Create the most simple version of a player, will not be able to deposit or spin until additional data is provided.
       description: >
         This allows you to create a "user" which can later be turned into a player by providing additional data. 
@@ -680,6 +683,7 @@ paths:
         - Game Library
         - Protected
         - Player
+        - Unimplemented
       summary: > 
         Get the count of games available for the player. 
         
@@ -724,6 +728,7 @@ paths:
       tags:
         - Player
         - Protected
+        - Unimplemented
       summary: Get the count of player favorites
       description: > 
         Returns the count of player favorites in header.
@@ -910,6 +915,7 @@ paths:
         - Player
         - Protected
         - Reviews
+        - Unimplemented
       summary: Get the count of player ratings
       description: > 
         Returns the count of player ratings in header.
@@ -1725,6 +1731,7 @@ paths:
     head:
         tags:
           - Validation
+          - Unimplemented
         summary: > 
           Validate a value against the passed validator
         parameters:
