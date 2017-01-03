@@ -1147,6 +1147,35 @@ paths:
         '401':
           $ref: '#/responses/Error'
 
+  /player/changepass:
+    post:
+      tags:
+        - Player
+      summary: Player change password
+      description: >
+        Possible error codes (resultCode): old_password_missing, new_password_missing, invalid_old_password, invalid_new_password
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              old_password:
+                type: string
+              new_password:
+                type: string
+      responses:
+        200:
+          description: Password changed successfuly
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          $ref: '#/responses/Info'
   /player/logout:
     get:
       tags:
