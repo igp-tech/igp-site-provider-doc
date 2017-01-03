@@ -1203,7 +1203,7 @@ paths:
       summary: >
         Request a password reset. Email is to be sent. Token inside email. This API is only returning success/fail.
       description: >
-        Possible error codes (resultCode): missing_email
+        Possible error codes (resultCode): missing_email, player_not_found, account_blocked
       parameters:
         - name: body
           in: body
@@ -1334,7 +1334,7 @@ paths:
         - Protected
       summary: Reset a players password
       description: >
-        #Possible error codes (resultCode): missing_password, invalid_input
+        Possible error codes (resultCode): missing_password, invalid_input, token_expired
       parameters:
         - name: token
           in: path
