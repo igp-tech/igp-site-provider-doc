@@ -629,7 +629,7 @@ paths:
           - Protected
         summary: Get game
         description: >
-          Possible error codes (resultCode): game_not_found
+          Possible error codes (resultCode): game_not_found, game_not_available
         parameters:
           - $ref: "#/parameters/Session"
           - name: id
