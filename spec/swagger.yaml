@@ -89,6 +89,8 @@ info:
       * invalid_input - invalid input
       * invalid_username_or_password - invalid username or password
       * invalid_version - updating invalid version
+      * invalid_old_password - invalid old password
+      * invalid_new_password - invalid_new_password
       * page_not_found - page do not exists
       * game_not_found - game do not exists
       * missing_email - missing email
@@ -96,6 +98,8 @@ info:
       * missing_version - missing version
       * missing_username - missing username
       * missing_password - missing password
+      * old_password_missing - old password is missing
+      * new_password_missing - new password is missing
       * payment_processor_error - payment processor error
       * payment_processor_invalid_parameters - invalid input parameters
       * account_blocked - player account is blocked
@@ -103,6 +107,9 @@ info:
       * account_frozen - player account is temporary frozen
       * account_pending - player activation not complete
       * account_unactivated - player account is not activated
+      * termsofuse_changed - player needs to accept new terms of use
+      * token_expired - token expired
+      * game_not_available
 
   version: "2.4.10"
 tags:
