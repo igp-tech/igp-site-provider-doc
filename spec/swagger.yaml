@@ -2156,34 +2156,54 @@ definitions:
         type: boolean
 
   Transaction:
-    description: Transaction
+    description: Player transaction
     type: object
     properties:
       id:
+        type: number
+        description: unique id
+      amount:
+        type: number
+        description: amount of deposit/withdrawal
+      start_balance:
+        type: number
+        description: users start balance before deposit/withdrawal action
+      end_balance:
+        type: number
+        description: users end balance after deposit/withdrawal action
+      email:
         type: string
-      time_stamp:
+        description: users email address
+      date_request:
+        type: datetime
+        description: datetime when user requested deposit/withdrawal
+      date_processed:
+        type: datetime
+        description: datetime when transaction is processed by payment processor
+      status:
         type: string
-      details:
+        description: transaction status ('PENDING','PROCESSED','FAILED','CANCELLED','ERROR','DENIED','IN PROGRESS')
+      withdrawals_limit_exceeded:
+        type: boolean
+        description: user has exceeded his withdrawal limit
+      type:
         type: string
-      credit:
+        description: payment type (deposit/withdrawal)
+      instrument:
         type: string
-      debit:
+        description: payment processor
+      instrument_type:
         type: string
-      balance:
+        description: payment method
+      instrument_transid:
         type: string
-      transid:
+        description: unique transaction id
+      message:
         type: string
-      transby:
+        description: message in case of success
+      error_message:
         type: string
-      agentuser:
-        type: string
-      method:
-        type: string
-      system:
-        type: string
-      accountuser:
-        type: string
-  
+        description: error message in case of an error
   
   PlayerData:
     description: >
