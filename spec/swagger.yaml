@@ -159,6 +159,8 @@ paths:
       tags:
         - Game Library
       summary: Get games list
+      parameters:
+        - $ref: "#/parameters/AnonSession"
       responses:
         '200':
           description: Response object
@@ -181,6 +183,7 @@ paths:
         - Game Library
       summary: Get a single game
       parameters:
+        - $ref: "#/parameters/AnonSession"
         - name: id
           in: path
           required: true
@@ -212,6 +215,8 @@ paths:
           * registrationQuick 
           * PlayerProfile.
       summary: Retrieve all player schemas for site.
+      parameters:
+        - $ref: "#/parameters/AnonSession"
       responses:
         '200':
           description: Response object
@@ -232,7 +237,8 @@ paths:
         - Registration
       summary: Retrieve a single PlayerProfile by code
       parameters:
-       - $ref: "#/parameters/SchemaCode"
+        - $ref: "#/parameters/AnonSession"
+        - $ref: "#/parameters/SchemaCode"
       responses:
         '200':
           description: Response object
@@ -254,6 +260,7 @@ paths:
           Is an alias for `/validate/player [POST]`
         
       parameters:
+        - $ref: "#/parameters/AnonSession"
         - name: body
           in: body
           required: true
@@ -282,11 +289,7 @@ paths:
         - Player
       description: Registration captcha
       parameters:
-        - name: x-igp-session
-          in: header
-          description: user session (returned by GET /player)
-          required: true
-          type: string
+        - $ref: "#/parameters/AnonSession"
         - name: width
           in: query
           type: number
@@ -410,6 +413,7 @@ paths:
         Possible error codes (resultCode): invalid_input
 
       parameters:
+        - $ref: "#/parameters/AnonSession"
         - name: autologin
           in: query
           description: > 
@@ -472,6 +476,7 @@ paths:
           
           Possible error codes (resultCode): invalid_input
       parameters:
+        - $ref: "#/parameters/AnonSession"
         - name: body
           in: body
           required: true
@@ -545,6 +550,7 @@ paths:
         the backend to allow automated cart-ababandon type scenarios.
         
       parameters:
+        - $ref: "#/parameters/AnonSession"
         - name: autologin
           in: query
           description: > 
@@ -1131,6 +1137,7 @@ paths:
         Possible error codes (resultCode): missing_password, missing_username, invalid_username_or_password, account_blocked, account_deactivated, account_frozen, account_pending, account_unactivated
             
       parameters:
+        - $ref: "#/parameters/AnonSession"
         - name: body
           in: body
           required: true
@@ -1212,6 +1219,7 @@ paths:
       description: >
         Possible error codes (resultCode): missing_email, player_not_found, account_blocked
       parameters:
+        - $ref: "#/parameters/AnonSession"
         - name: body
           in: body
           required: true
@@ -1237,6 +1245,8 @@ paths:
       tags:
         - Terms of Use
       summary: Retrieves latest TOU text, in all avail languages.
+      parameters:
+        - $ref: "#/parameters/AnonSession"
       responses:
         '200':
           description: Retrieved TOU information
@@ -1268,6 +1278,7 @@ paths:
         - Terms of Use
       summary: Latest published Terms of Use
       parameters:
+        - $ref: "#/parameters/AnonSession"
         - name: langCode
           in: path
           required: true
@@ -1308,6 +1319,7 @@ paths:
       description: >
         Possible error codes (resultCode): missing_version, invalid_version
       parameters:
+        - $ref: "#/parameters/Session"
         - name: body
           in: body
           required: true
@@ -1338,11 +1350,11 @@ paths:
       tags:
         - Player
         - Auth
-        - Protected
       summary: Reset a players password
       description: >
         Possible error codes (resultCode): missing_password, invalid_input, token_expired
       parameters:
+        - $ref: "#/parameters/AnonSession"
         - name: token
           in: path
           required: true
@@ -1693,6 +1705,8 @@ paths:
         
           `/validate/js/[validatorKey].js`
           
+      parameters:
+        - $ref: "#/parameters/AnonSession"
       responses:
         200:
           description: >
@@ -1714,6 +1728,7 @@ paths:
         - Validation
       description: Retrieves the Javascript code which can be used to validate the designated type of data.
       parameters:
+        - $ref: "#/parameters/AnonSession"
         - name: validatorKey
           in: path
           required: true
@@ -1731,6 +1746,7 @@ paths:
       summary: > 
         Validate a value against the passed validator
       parameters:
+        - $ref: "#/parameters/AnonSession"
         - name: validatorKey
           in: path
           required: true
@@ -1802,6 +1818,7 @@ paths:
         Checks the submitted email to see if is valid for a new user for the site. Checks duplicates and email validity.
         ### Possible error codes (resultCode): invalid_input
       parameters:
+        - $ref: "#/parameters/AnonSession"
         - name: email
           in: path
           required: true
@@ -1838,6 +1855,7 @@ paths:
         Checks the submitted username to see if is valid for a new user for the site. Checks duplicates and username standards.
         ### Possible error codes (resultCode): invalid_input
       parameters:
+        - $ref: "#/parameters/AnonSession"
         - name: username
           in: path
           required: true
@@ -2175,10 +2193,12 @@ definitions:
         type: string
         description: users email address
       date_request:
-        type: datetime
+        type: string
+        format: date-time
         description: datetime when user requested deposit/withdrawal
       date_processed:
-        type: datetime
+        type: string
+        format: date-time
         description: datetime when transaction is processed by payment processor
       status:
         type: string
@@ -2668,6 +2688,12 @@ parameters:
     in: header
     description: IGP session key
     required: true
+    type: string
+  AnonSession:
+    name: x-igp-session
+    in: header
+    description: Anon. IGP session key
+    required: false
     type: string
   SchemaCode:
     name: SchemaCode
