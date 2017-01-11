@@ -83,6 +83,8 @@ info:
       * success - operation completed successfuly
       * unauthorized - unauthorized request
       * session_expired - player session expired
+      * ESOCKETTIMEDOUT - request timeout
+      * anonsession_missing_or_expired - anonymous session missing or expired (required for non-protected endpoints)
 
     #### Other request specific result codes (resultCode):
 
@@ -2693,7 +2695,7 @@ parameters:
     name: x-igp-session
     in: header
     description: Anon. IGP session key
-    required: false
+    required: true
     type: string
   SchemaCode:
     name: SchemaCode
