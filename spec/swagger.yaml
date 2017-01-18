@@ -342,13 +342,6 @@ paths:
       responses:
         '200':
           description: Session is Valid
-          headers:
-            "x-valid":
-              type: boolean
-              description: True if valid session.
-            "x-tou-valid":
-              type: boolean
-              description: False if the TOU needs to be re-accepted (new version)
         '401':
           description: Invalid session
           headers:
