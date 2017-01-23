@@ -1530,6 +1530,108 @@ paths:
           $ref : "#/responses/Error"
         401:
           $ref : "#/responses/Error"
+          
+
+  /player/cashier/custom/fields/{transtype}:
+    get:
+      summary: Custom cashier
+      tags:
+        - Cashier
+        - Player
+        - Protected
+      description: >
+        Lists all available deposit and withdraw methods for the active player
+        with fields to build up custom deposit/withdraw forms
+
+        Possible error codes (resultCode): payment_processor_invalid_parameters, payment_processor_error
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: transtype
+          in: path
+          required: true
+          type: string
+          enum:
+            - deposit
+            - withdrawal
+            - both
+          
+          description: deposit or withdraw, or both
+      responses:
+        '200':
+          description: Payment url
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              response:
+                type: object
+                properties:
+                  deposit_methods:
+                    $ref: "#/definitions/paymentCategories"
+                  withdraw_methods:
+                    $ref: "#/definitions/paymentCategories"
+        401:
+          $ref : "#/responses/Error"
+
+  /player/cashier/payment/{paymentmethod}:
+    post:
+      summary: Payment submit form
+      tags:
+        - Cashier
+        - Player
+        - Protected
+      description: >
+        Lists all fields to be posted
+        Possible error codes (resultCode): payment_processor_invalid_parameters, payment_processor_error
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: body
+          in: body
+          required: true
+          description: list off all fields to be posted
+          schema:
+            $ref: "#/definitions/FieldDef"
+        - name: paymentmethod
+          in: path
+          required: true
+          type: string
+          description: payment method
+      responses:
+        '200':
+          description: success output
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              response:
+                type: object
+                properties:
+                  type: 
+                    description: type of response
+                    type: string
+                    enum:
+                      - complete
+                      - redirect
+                  message:
+                    type: string
+                    description: returned message (optional)
+                  method:
+                    type: string
+                    description: type of method (optional)
+                    enum:
+                      - POST
+                      - GET
+                  url: 
+                    type: string
+                    description: url to post data or redirect url (optional)
+                  parameters:
+                    type: object
+                    description: list of parameters to be sended (optional)
+        401:
+          $ref : "#/responses/Error"
+
   /player/cashier/transactions/{operation}/{processor}:
     get:
       tags:
@@ -2621,6 +2723,107 @@ definitions:
       image:
         type: string
         description: URL to full size image for this payment provider.
+
+  paymentCategories:
+    description: Payment categories
+    type: object
+    properties:
+      bank_transfers:
+        type: array
+        items:
+            $ref: "#/definitions/paymentMethod"
+      credit_cards:
+        type: array
+        items:
+            $ref: "#/definitions/paymentMethod"
+      debit_cards:
+        type: array
+        items:
+            $ref: "#/definitions/paymentMethod"
+      instant_banking:
+        type: array
+        items:
+            $ref: "#/definitions/paymentMethod"
+      e_wallets:
+        type: array
+        items:
+            $ref: "#/definitions/paymentMethod"
+      prepaid_cards:
+        type: array
+        items:
+            $ref: "#/definitions/paymentMethod"
+      money_orders:
+        type: array
+        items:
+            $ref: "#/definitions/paymentMethod"
+      bitcoins:
+        type: array
+        items:
+            $ref: "#/definitions/paymentMethod"
+      mobile_banks:
+        type: array
+        items:
+            $ref: "#/definitions/paymentMethod"
+      other:
+        type: array
+        items:
+            $ref: "#/definitions/paymentMethod"
+
+  paymentMethod:
+    description : Information regarding an available payment method.
+    type: object
+    properties:
+      name:
+        type: string
+      code:
+        type: string
+        description: Code representing the payment method type, to allow for consumer translations.
+      text:
+        type: string
+        description: Payment Text
+      timeStr:
+        type: string
+        description: String decription of the transacction time
+      isInstant:
+        type: boolean
+        default: false
+        description: is the transaction instantly credited/debited to the account
+      fee:
+        type: string
+        description: Text decription of the fee.
+      limits:
+        description: Information about limits for the payment method, as text.
+        type: object
+        properties:
+          minAmountStr:
+            type: string
+          maxAmountStr:
+            type: string
+          minAmountVal:
+            type: number
+          maxAmountVal:
+            type: number
+      image:
+        type: string
+        description: URL to full size image for this payment provider. 
+      form:
+        type: object
+        description: Information about fields for payment method
+        properties: 
+          method:
+            description: avaliable methods
+            enum:
+              - POST
+            type: string
+          url:
+            description: url to post data
+            type: string
+          fields:
+            type: array
+            description: list off all fields to be posted
+            items:
+              $ref: "#/definitions/FieldDef"        
+        
   GameTransaction:
     description: Transaction
     type: object
