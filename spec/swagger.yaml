@@ -1534,7 +1534,7 @@ paths:
 
   /player/cashier/custom/fields/{transtype}:
     get:
-      summary: Custom cashier
+      summary: Custom cashier (form)
       tags:
         - Cashier
         - Player
