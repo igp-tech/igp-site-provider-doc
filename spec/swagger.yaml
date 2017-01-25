@@ -137,10 +137,10 @@ tags:
     description: Endpoints that have been put out of production, will not be implemented
   - name: Terms of Use
     description : Endpoints related to Terms of Use.
-host: dev.pantaloo.com
+host: demo-api.igp.cloud
 schemes:
-  - http
-basePath: /api/v2/site
+  - https
+basePath: /api
 produces:
   - application/json
 paths:
@@ -587,6 +587,8 @@ paths:
           $ref: "#/responses/InvalidPlayerdata"
   /anon:
     get:
+      tags:
+        - Session
       summary: Get/start anonymous session
       description: >
         Required for captcha validation/registration process
@@ -1103,6 +1105,10 @@ paths:
                 $ref: "#/definitions/Info"
   /player/games/transactions:
     get:
+      tags:
+        - Player
+        - Game Library
+        - Protected
       summary: Get player game transactions
       parameters:
         - $ref: "#/parameters/Session"
