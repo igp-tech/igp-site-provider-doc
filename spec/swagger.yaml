@@ -522,6 +522,12 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/PlayerData'
+        - name: schemaCode
+          in: query
+          type: string
+          description: >
+            Schema which will be used for updating player. If not defined, system will fallback to `playerProfile` schema,
+              which is default when updating player data from portal.
 
       responses:
         '200':
