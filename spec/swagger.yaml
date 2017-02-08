@@ -1591,7 +1591,7 @@ paths:
         401:
           $ref : "#/responses/Error"
 
-  /player/cashier/payment/{paymentmethod}:
+  /player/cashier/payment/{paymentmethod}/{transtype}:
     post:
       summary: Payment submit form
       tags:
@@ -1613,12 +1613,20 @@ paths:
           required: true
           description: list off all fields to be posted
           schema:
-            $ref: "#/definitions/FieldDef"
+            $ref: "#/definitions/PaymentSubmit"
         - name: paymentmethod
           in: path
           required: true
           type: string
           description: payment method
+        - name: transtype
+          in: path
+          required: true
+          type: string
+          enum:
+            - deposit
+            - withdrawal
+          description: deposit/withdrawal
       responses:
         '200':
           description: success output
@@ -2389,6 +2397,16 @@ definitions:
         type: number
       schemaCode:
         $ref: "#/definitions/SchemaCode"
+      fields:
+        type: array
+        items:
+          $ref: "#/definitions/FieldInstance"
+          
+  PaymentSubmit:
+    description: |
+      Object for submitting a payment.
+    type: object
+    properties:
       fields:
         type: array
         items:
