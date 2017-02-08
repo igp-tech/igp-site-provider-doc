@@ -1558,6 +1558,11 @@ paths:
         Possible error codes (resultCode): payment_processor_invalid_parameters, payment_processor_error
       parameters:
         - $ref: "#/parameters/Session"
+        - name: x-language
+          in: header
+          required: false
+          type: string
+          description: Defaults to en_GB
         - name: transtype
           in: path
           required: true
@@ -1598,6 +1603,11 @@ paths:
         Possible error codes (resultCode): payment_processor_invalid_parameters, payment_processor_error
       parameters:
         - $ref: "#/parameters/Session"
+        - name: x-language
+          in: header
+          required: false
+          type: string
+          description: Defaults to en_GB
         - name: body
           in: body
           required: true
