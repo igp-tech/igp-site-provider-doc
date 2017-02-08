@@ -1531,7 +1531,7 @@ paths:
             properties:
               info:
                 $ref: "#/definitions/Info"
-              response:
+              data:
                 type: object
                 properties:
                   deposit_methods:
@@ -1581,7 +1581,7 @@ paths:
             properties:
               info:
                 $ref: "#/definitions/Info"
-              response:
+              data:
                 type: object
                 properties:
                   deposit_methods:
@@ -1635,9 +1635,46 @@ paths:
             properties:
               info:
                 $ref: "#/definitions/Info"
-              response:
+              data:
                 type: object
                 properties:
+                  redirect:
+                    description: a redirect object
+                    type: object
+                    properties:
+                      method:
+                        type: string
+                        description: HTTP method to use when redirecting
+                        enum:
+                          - POST
+                          - GET
+                      container: 
+                        type: string
+                        description: a container to use (iFrame or window)
+                        enum:
+                          - iframe
+                          - window
+                      url:
+                        type: string
+                        description: a redirect url
+                      parameters:
+                        type: object
+                        description: params to include in redirect url 
+                      html:
+                        type: string
+                        description: string of HTML to display
+                      width:
+                        type: string
+                        description: the width in pixels of redirect container
+                      height:
+                        type: string
+                        description: the height in pixels of redirect container
+                  messages:
+                    description: a message object
+                    type: object
+                  transactionid: 
+                    description: a refrence to the transaction
+                    type: string
                   type: 
                     description: type of response
                     type: string
