@@ -1590,7 +1590,7 @@ paths:
                     $ref: "#/definitions/paymentCategories"
         401:
           $ref : "#/responses/Error"
-
+  
   /player/cashier/payment/{paymentmethod}/{transtype}:
     post:
       summary: Payment submit form
@@ -1660,7 +1660,27 @@ paths:
                     type: object
                     description: list of parameters to be sended (optional)
         401:
-          $ref : "#/responses/Error"
+          $ref: "#/responses/InvalidPaymentdata"
+
+  /player/cashier/status/{transactionid}:
+    get:
+      summary: get the information about a particular payment transaction
+      tags: 
+        - Cashier
+        - Player
+        - Protected
+      description: get the information about a particular payment transaction from the payment processor
+      parameters:
+        - name: transactionid
+          in: path
+          required: true
+          type: string
+          description: id of the transaction we need status of
+      responses:
+        '200':
+          description: success output (TBD)
+        '404':
+          description: transaction with transactionid not found (TBD)
 
   /player/cashier/transactions/{operation}/{processor}:
     get:
@@ -2917,6 +2937,27 @@ responses:
                   items:
                       $ref: "#/definitions/InvalidField"
 
+  InvalidPaymentdata:
+    description: Information returned when payment fails
+    schema:
+          type: object
+          properties:
+            info:
+              $ref: "#/definitions/Info"
+            data:
+              type: object
+              properties:
+                record:
+                  description: Additional information about record level invalidation.
+                  type: array
+                  items:
+                    $ref: "#/definitions/Error"
+            
+                fields:
+                  description: an array of invalid fields, with an array of the invalid validators.
+                  type: array
+                  items:
+                      $ref: "#/definitions/InvalidField"
   
   Error:
     description: Error Information
