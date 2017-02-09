@@ -1670,32 +1670,18 @@ paths:
                         type: string
                         description: the height in pixels of redirect container
                   messages:
-                    description: a message object
-                    type: object
+                    description: a list of message objects
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        key:
+                          type: string
                   transactionid: 
                     description: a refrence to the transaction
                     type: string
-                  type: 
-                    description: type of response
-                    type: string
-                    enum:
-                      - complete
-                      - redirect
-                  message:
-                    type: string
-                    description: returned message (optional)
-                  method:
-                    type: string
-                    description: type of method (optional)
-                    enum:
-                      - POST
-                      - GET
-                  url: 
-                    type: string
-                    description: url to post data or redirect url (optional)
-                  parameters:
-                    type: object
-                    description: list of parameters to be sended (optional)
         401:
           $ref: "#/responses/InvalidPaymentdata"
 
