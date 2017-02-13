@@ -1501,6 +1501,7 @@ paths:
         - Cashier
         - Player
         - Protected
+        - Deprecated
       description: >
         Lists all available deposit and withdraw methods for the active player
         with urls to deposit/withdraw forms
@@ -1585,9 +1586,13 @@ paths:
                 type: object
                 properties:
                   deposit_methods:
-                    $ref: "#/definitions/paymentCategories"
+                    type: array
+                    items:
+                      $ref: "#/definitions/paymentMethod"
                   withdraw_methods:
-                    $ref: "#/definitions/paymentCategories"
+                    type: array
+                    items:
+                      $ref: "#/definitions/paymentMethod"
         401:
           $ref : "#/responses/Error"
   
@@ -2807,51 +2812,6 @@ definitions:
         type: string
         description: URL to full size image for this payment provider.
 
-  paymentCategories:
-    description: Payment categories
-    type: object
-    properties:
-      bank_transfers:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      credit_cards:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      debit_cards:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      instant_banking:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      e_wallets:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      prepaid_cards:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      money_orders:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      bitcoins:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      mobile_banks:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      other:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-
   paymentMethod:
     description : Information regarding an available payment method.
     type: object
@@ -2861,6 +2821,20 @@ definitions:
       code:
         type: string
         description: Code representing the payment method type, to allow for consumer translations.
+      category:
+        type: string
+        description: A category of payment
+        enum:
+          - bank_transfers
+          - credit_cards
+          - debit_cards
+          - instant_banking
+          - e_wallets
+          - prepaid_cards
+          - money_orders
+          - bitcoins
+          - mobile_banks
+          - other
       text:
         type: string
         description: Payment Text
@@ -2893,20 +2867,12 @@ definitions:
         type: object
         description: Information about fields for payment method
         properties: 
-          method:
-            description: avaliable methods
-            enum:
-              - POST
-            type: string
-          url:
-            description: url to post data
-            type: string
           fields:
             type: array
             description: list off all fields to be posted
             items:
-              $ref: "#/definitions/FieldDef"        
-        
+              $ref: "#/definitions/FieldDef"  
+  
   GameTransaction:
     description: Transaction
     type: object
