@@ -644,8 +644,103 @@ paths:
                   touValid:
                     description: Has the user accepted the current TOU
                     type: boolean
-                  
-      
+  
+  /player/bonus:
+    get:
+      tags:
+        - Player
+        - Protected
+        - Bonus
+      summary: Gets the available bonuses for a player
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: paymentmethod
+          in: query
+          required: false
+          type: string
+          description: payment method
+      responses:
+        '200':
+          description: Player bonuses
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    bonus_id:
+                      description: bonus id
+                      type: string
+                    name:
+                      description: Bonus name
+                      type: string
+                    stub:
+                      description: Slug for bonus in CMS
+                      type: string
+                    valid_until:
+                      description: Bonus valid until date
+                      type: string
+                    valid_from:
+                      description: Bonus valid from date
+                      type: string
+                    deposit_min:
+                      description: Minimal deposit to achieve bonus
+                      type: number
+                    deposit_max:
+                      description: Maximum deposit to achieve bonus
+                      type: number
+                    payment_methods:
+                      description: Payment methods for which this bonus is applicable
+                      type: array
+                      items:
+                        type: string
+        400: 
+          description: Unble to fetch bonuses
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+  
+  /player/bonus/activate:
+    post:
+      tags:
+        - Player
+        - Protected
+        - Bonus
+      summary: Activate a selected bonus
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              bonus_code:
+                type: string
+              bonus_id:
+                type: string
+      responses:
+        '200':
+          description: Bonus applied
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400: 
+          description: Unble to fetch bonuses
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"      
+                    
   /player/game/{id}:
       get:
         tags:
