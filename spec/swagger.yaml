@@ -1770,15 +1770,10 @@ paths:
                         type: string
                         description: the height in pixels of redirect container
                   messages:
-                    description: a list of message objects
+                    description: a list of messages
                     type: array
                     items:
-                      type: object
-                      properties:
-                        message:
-                          type: string
-                        key:
-                          type: string
+                      $ref: "#/definitions/TransMessage"
                   transactionid: 
                     description: a refrence to the transaction
                     type: string
@@ -1801,7 +1796,18 @@ paths:
           description: id of the transaction we need status of
       responses:
         '200':
-          description: success output (TBD)
+          description: Transaction info
+          schema:
+            type: object
+            properties:
+              state:
+                type: string
+                description: transaction state
+              messages:
+                description: a list of messages
+                type: array
+                items:
+                  $ref: "#/definitions/TransMessage"
         '404':
           description: transaction with transactionid not found (TBD)
 
@@ -2995,8 +3001,21 @@ definitions:
       system:
         type: string
       accountuser:
-        type: string        
-          
+        type: string
+
+  TransMessage:
+    description: Transaction message
+    type: object
+    properties:
+      label:
+        type: string
+        description: Description
+      value:
+        type: string
+        description: Value
+      key:
+        type: string
+        description: Optional
 
 responses:
   InvalidPlayerdata:
