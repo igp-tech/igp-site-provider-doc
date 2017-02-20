@@ -658,7 +658,12 @@ paths:
           in: query
           required: false
           type: string
-          description: payment method
+          description: payment method for which to get bonuses.
+        - name: bonus_code
+          in: query
+          required: false
+          type: string
+          description: Bonus Code. If present, the result will only return relevant bonus that has the bonus code.
       responses:
         '200':
           description: Player bonuses
