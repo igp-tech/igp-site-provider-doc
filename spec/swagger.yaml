@@ -1785,9 +1785,12 @@ paths:
                     type: array
                     items:
                       $ref: "#/definitions/TransMessage"
-                  transactionid: 
-                    description: a refrence to the transaction
+                  status: 
+                    description: states of transaction
                     type: string
+                    enum:
+                      - redirect
+                      - complete
         401:
           $ref: "#/responses/InvalidPaymentdata"
 
