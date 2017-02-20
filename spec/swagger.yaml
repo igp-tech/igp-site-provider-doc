@@ -137,6 +137,12 @@ tags:
     description: Endpoints that have been put out of production, will not be implemented
   - name: Terms of Use
     description : Endpoints related to Terms of Use.
+  - name: Unimplemented
+    description : Endpoints planned to be implemented in the near future
+  - name: Session
+    description : Endpoints related to Session
+  - name: Bonus
+    description : Endpoints related to Bonuses
 host: demo-api.igp.cloud
 schemes:
   - https
