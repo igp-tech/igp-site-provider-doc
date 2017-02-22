@@ -730,8 +730,6 @@ paths:
           schema:
             type: object
             properties:
-              bonus_code:
-                type: string
               bonus_id:
                 type: string
       responses:
