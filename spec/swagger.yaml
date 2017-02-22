@@ -666,7 +666,7 @@ paths:
           type: string
           description: payment method for which to get bonuses.
       responses:
-        '200':
+        200:
           description: Player bonuses
           schema:
             type: object
@@ -735,7 +735,7 @@ paths:
               bonus_id:
                 type: string
       responses:
-        '200':
+        200:
           description: Bonus applied
           schema:
             type: object
@@ -768,7 +768,7 @@ paths:
               bonus_code:
                 type: string
       responses:
-        '200':
+        200:
           description: Bonus validated
           schema:
             type: object
