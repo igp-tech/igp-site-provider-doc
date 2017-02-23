@@ -2007,49 +2007,6 @@ paths:
           
         400:
           description: Error
-      
-  /player/page/{page}: 
-    get:
-      tags:
-        - Player
-        - Cashier
-        - Protected
-        - Deprecated
-      summary: Player iframe pages
-      description: >
-        Possible error codes (resultCode): page_not_found
-      parameters:
-        - $ref: "#/parameters/Session"
-        - name: page
-          in: path
-          required: true
-          type: string
-          enum:
-            - profile
-            - cashier
-            - register
-          description: 'Options profile, cashier, register'
-        - name: lang
-          in: query
-          description: Set page language, defaults to en_GB
-          required: false
-          default: en_GB
-          type: string
-      responses:
-        '200':
-          description: Iframe url
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              data:
-                type: object
-                properties:
-                  page:
-                    type: string
-        '401':
-          $ref: '#/responses/Info'
   
   /validate:
     get:
