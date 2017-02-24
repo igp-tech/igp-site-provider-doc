@@ -1660,57 +1660,6 @@ paths:
                       enum:
                         - notification
                         - Error
-  
-  /player/cashier/custom/{transtype}:
-    get:
-      summary: Custom cashier
-      tags:
-        - Cashier
-        - Player
-        - Protected
-        - Deprecated
-      description: >
-        Lists all available deposit and withdraw methods for the active player
-        with urls to deposit/withdraw forms
-
-        ### Possible error codes (resultCode): payment_processor_invalid_parameters
-      parameters:
-        - $ref: "#/parameters/Session"
-        - name: transtype
-          in: path
-          required: true
-          type: string
-          enum:
-            - deposit
-            - withdrawal
-            - both
-          
-          description: deposit or withdrawal, or both
-        - name: reUrl
-          in: query
-          required: true
-          type: string
-          description: Return url.
-      responses:
-        '200':
-          description: Payment url
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              data:
-                type: object
-                properties:
-                  deposit_methods:
-                    $ref: "#/definitions/PaymentMethods"
-                  withdraw_methods:
-                    $ref: "#/definitions/PaymentMethods"
-        400: 
-          $ref : "#/responses/Error"
-        401:
-          $ref : "#/responses/Error"
-          
 
   /player/cashier/custom/fields/{transtype}:
     get:
@@ -1966,6 +1915,7 @@ paths:
         - Player
         - Cashier
         - Protected
+        - Unimplemented
       summary: Retrieve the players payment accounts
       description: >
         Retrieves all accounts for the player. These accounts, with their ids,
@@ -2857,93 +2807,6 @@ definitions:
       pageSize:
         description: The size of each page, 0 if no paging.
         type: integer
-
-   
-  
-  PaymentMethods:
-    description: Payment methods available
-    type: object
-    properties:
-      bank_transfers:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      credit_cards:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      debit_cards:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      instant_banking:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      e_wallets:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      prepaid_cards:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      money_orders:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      bitcoins:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      mobile_banks:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      other:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-  PaymentMethod:
-    description : Information regarding an available deposit method.
-    type: object
-    properties:
-      name:
-        type: string
-      code:
-        type: string
-        description: Code representing the deposit type, to allow for consumer translations.
-      text:
-        type: string
-        description: Payment Text
-      timeStr:
-        type: string
-        description: String decription of the transacction time
-      isInstant:
-        type: boolean
-        default: false
-        description: is the transaction instantly credited/debited to the account
-      fee:
-        type: string
-        description: Text decription of the fee.
-      limits:
-        description: Information about limits for the deposit method, as text.
-        type: object
-        properties:
-          minAmountStr:
-            type: string
-          maxAmountStr:
-            type: string
-          minAmountVal:
-            type: number
-          maxAmountVal:
-            type: number
-      url:
-        type: string
-        description: url link to the payment method
-      image:
-        type: string
-        description: URL to full size image for this payment provider.
 
   paymentMethod:
     description : Information regarding an available payment method.
