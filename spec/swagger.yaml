@@ -732,6 +732,9 @@ paths:
             properties:
               bonus_id:
                 type: string
+              bonus_code:
+                type: string
+                description: optional
       responses:
         200:
           description: Bonus applied
@@ -765,6 +768,9 @@ paths:
             properties:
               bonus_code:
                 type: string
+              bonus_code:
+                type: string
+                description: optional
       responses:
         200:
           description: Bonus validated
