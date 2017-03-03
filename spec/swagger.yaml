@@ -2653,6 +2653,7 @@ definitions:
               - color
               - TAC
               - Country
+              - hidden
           dataType:
             $ref: "#/definitions/DataType"
         
