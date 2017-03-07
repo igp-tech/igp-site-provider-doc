@@ -665,6 +665,11 @@ paths:
           required: false
           type: string
           description: payment method for which to get bonuses.
+        - name: onlyavailable
+          in: query
+          required: false
+          type: boolean
+          description: filter by availability
       responses:
         200:
           description: Player bonuses
@@ -706,6 +711,9 @@ paths:
                         type: string
                     activated_for_player:
                       description: Is this bonus already activated for this player
+                      type: boolean
+                    available:
+                      description: Available for activation
                       type: boolean
         400: 
           description: Unble to fetch bonuses
