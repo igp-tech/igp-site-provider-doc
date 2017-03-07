@@ -774,7 +774,7 @@ paths:
           schema:
             type: object
             properties:
-              bonus_code:
+              bonus_id:
                 type: string
               bonus_code:
                 type: string
@@ -2705,6 +2705,19 @@ definitions:
             type: array
             items:
               $ref: "#/definitions/DropDownValue"
+          encryption:
+            type: object
+            description: (optional) If field requires encryption
+            properties:
+              type:
+                type: string
+                description: for instance.. text/javascript
+              src:
+                type: string
+                description: url source of encryption
+              function:
+                type: string
+                description: function name
           validators:
             type: array
             items:
