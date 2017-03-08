@@ -1726,7 +1726,7 @@ paths:
         401:
           $ref : "#/responses/Error"
   
-  /player/cashier/payment/{paymentmethod}/{transtype}:
+  /player/cashier/payment/{processor}/{method}/{type}:
     post:
       summary: Payment submit form
       tags:
@@ -1749,12 +1749,17 @@ paths:
           description: list off all fields to be posted
           schema:
             $ref: "#/definitions/PaymentSubmit"
-        - name: paymentmethod
+        - name: processor
+          in: path
+          required: true
+          type: string
+          description: payment processor (paymentiq,..)
+        - name: method
           in: path
           required: true
           type: string
           description: payment method
-        - name: transtype
+        - name: type
           in: path
           required: true
           type: string
@@ -2845,6 +2850,9 @@ definitions:
       code:
         type: string
         description: Code representing the payment method type, to allow for consumer translations.
+      processor:
+        type: string
+        description: payment processor used for this method (paymentiq,...)
       category:
         type: string
         description: A category of payment
