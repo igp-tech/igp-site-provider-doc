@@ -681,40 +681,7 @@ paths:
               data:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    bonus_id:
-                      description: bonus id
-                      type: string
-                    name:
-                      description: Bonus name
-                      type: string
-                    stub:
-                      description: Slug for bonus in CMS
-                      type: string
-                    valid_until:
-                      description: Bonus valid until date
-                      type: string
-                    valid_from:
-                      description: Bonus valid from date
-                      type: string
-                    deposit_min:
-                      description: Minimal deposit to achieve bonus
-                      type: number
-                    deposit_max:
-                      description: Maximum deposit to achieve bonus
-                      type: number
-                    payment_methods:
-                      description: Payment methods for which this bonus is applicable
-                      type: array
-                      items:
-                        type: string
-                    activated_for_player:
-                      description: Is this bonus already activated for this player
-                      type: boolean
-                    available:
-                      description: Available for activation
-                      type: boolean
+                  $ref: '#/definitions/Bonus'
         400: 
           description: Unble to fetch bonuses
           schema:
@@ -751,6 +718,8 @@ paths:
             properties:
               info:
                 $ref: "#/definitions/Info"
+              data:
+                $ref: "#/definitions/Bonus"
         400: 
           description: Unble to fetch bonuses
           schema:
@@ -788,37 +757,7 @@ paths:
               info:
                 $ref: "#/definitions/Info"
               data:
-                type: object
-                properties:
-                  bonus_id:
-                    description: bonus id
-                    type: string
-                  name:
-                    description: Bonus name
-                    type: string
-                  stub:
-                    description: Slug for bonus in CMS
-                    type: string
-                  valid_until:
-                    description: Bonus valid until date
-                    type: string
-                  valid_from:
-                    description: Bonus valid from date
-                    type: string
-                  deposit_min:
-                    description: Minimal deposit to achieve bonus
-                    type: number
-                  deposit_max:
-                    description: Maximum deposit to achieve bonus
-                    type: number
-                  payment_methods:
-                    description: Payment methods for which this bonus is applicable
-                    type: array
-                    items:
-                      type: string
-                  activated_for_player:
-                    description: Is this bonus already activated for this player
-                    type: boolean
+                $ref: "#/definitions/Bonus"
         400: 
           description: Bonus not valid
           schema:
@@ -2947,6 +2886,40 @@ definitions:
       key:
         type: string
         description: Optional
+  
+  Bonus:
+    description: Bonus information
+    type: object
+    properties:
+      bonus_id:
+        description: bonus id
+        type: string
+      name:
+        description: Bonus name
+        type: string
+      stub:
+        description: Slug for bonus in CMS
+        type: string
+      valid_until:
+        description: Bonus valid until date
+        type: string
+      valid_from:
+        description: Bonus valid from date
+        type: string
+      deposit_min:
+        description: Minimal deposit to achieve bonus
+        type: number
+      deposit_max:
+        description: Maximum deposit to achieve bonus
+        type: number
+      payment_methods:
+        description: Payment methods for which this bonus is applicable
+        type: array
+        items:
+          type: string
+      activated_for_player:
+        description: Is this bonus already activated for this player
+        type: boolean
 
 responses:
   InvalidPlayerdata:
@@ -3021,6 +2994,7 @@ responses:
           responseTime:
             type: number
             format: float
+            
 parameters:
   Session:
     name: x-igp-session
