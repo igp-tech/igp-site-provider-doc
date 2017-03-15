@@ -2496,6 +2496,12 @@ definitions:
       Object for submitting a payment.
     type: object
     properties:
+      successUrl:
+        type: string
+        description: Return url in case of success
+      failureUrl:
+        type: string
+        description: Return url in case of failure
       fields:
         type: array
         items:
