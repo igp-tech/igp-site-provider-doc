@@ -1916,6 +1916,167 @@ paths:
         400:
           description: Error
   
+  /player/limits:
+    get:
+      tags: 
+      - Limits
+      summary: Player limits / restrictions
+      parameters:
+        - $ref: "#/parameters/Session"
+      responses:
+        200:
+          description : Player limits
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  time:
+                    type: object
+                    description: Session time limit
+                    properties:
+                      amount:
+                        type: number
+                        description: Session timeout limit in secconds
+                      bet:
+                        type: object
+                        description: Bet limit
+                        properties:
+                          amount:
+                            type: number
+                            description: Bet amount limit
+                          interval:
+                            type: string
+                            enum:
+                              - day
+                              - week
+                              - month
+                      loss:
+                        type: object
+                        description: Loss limit
+                        properties:
+                          amount:
+                            type: number
+                            description: Loss amount limit
+                          interval:
+                            type: string
+                            enum:
+                              - day
+                              - week
+                              - month
+                      deposit:
+                        type: object
+                        description: Daily deposit limit
+                        properties:
+                          amount:
+                            type: number
+                            
+  /player/limits/{type}:
+    post:
+      tags: 
+        - Limits
+      summary: Set player limit / restriction
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: type
+          in: path
+          type: string
+          required: true
+          enum: 
+            - time
+            - bet
+            - loss
+            - deposit
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              password:
+                type: string
+                description: Player password
+              amount:
+                type: number
+                description: bet/loss/desposit (money), time (seconds)
+              interval:
+                type: string
+                description: Required only by bet/loss
+                enum:
+                  - day
+                  - week
+                  - month
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          $ref: '#/responses/Error'
+          
+  /player/freeze:
+    post:
+      tags: 
+        - Limits
+      summary: Freez player account for number rof days
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              password:
+                type: string
+                description: Player password
+              amount:
+                type: number
+                description: Number of days
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          $ref: '#/responses/Error'
+          
+  /player/deactivate:
+    post:
+      tags: 
+        - Limits
+      summary: Deactivate player account
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              password:
+                type: string
+                description: Player password
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          $ref: '#/responses/Error'
+  
   /validate:
     get:
       tags:
