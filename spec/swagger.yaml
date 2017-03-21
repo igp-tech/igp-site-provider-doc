@@ -137,6 +137,12 @@ tags:
     description: Endpoints that have been put out of production, will not be implemented
   - name: Terms of Use
     description : Endpoints related to Terms of Use.
+  - name: Unimplemented
+    description : Endpoints planned to be implemented in the near future
+  - name: Session
+    description : Endpoints related to Session
+  - name: Bonus
+    description : Endpoints related to Bonuses
   - name: Lists
     description: Various lists and reports
 host: demo-api.igp.cloud
@@ -646,8 +652,122 @@ paths:
                   touValid:
                     description: Has the user accepted the current TOU
                     type: boolean
-                  
-      
+  
+  /player/bonus:
+    get:
+      tags:
+        - Player
+        - Protected
+        - Bonus
+      summary: Gets the available bonuses for a player
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: paymentmethod
+          in: query
+          required: false
+          type: string
+          description: payment method for which to get bonuses.
+        - name: onlyavailable
+          in: query
+          required: false
+          type: boolean
+          description: filter by availability
+      responses:
+        200:
+          description: Player bonuses
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Bonus'
+        400: 
+          description: Unble to fetch bonuses
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+  
+  /player/bonus/activate:
+    post:
+      tags:
+        - Player
+        - Protected
+        - Bonus
+      summary: Activate a selected bonus
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              bonus_id:
+                type: string
+              bonus_code:
+                type: string
+                description: optional
+      responses:
+        200:
+          description: Bonus applied
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                $ref: "#/definitions/Bonus"
+        400: 
+          description: Unble to fetch bonuses
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"   
+                
+  /player/bonus/validate:
+    post:
+      tags:
+        - Player
+        - Protected
+        - Bonus
+      summary: Validate a bonus based on bonus_code
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              bonus_id:
+                type: string
+              bonus_code:
+                type: string
+                description: optional
+      responses:
+        200:
+          description: Bonus validated
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                $ref: "#/definitions/Bonus"
+        400: 
+          description: Bonus not valid
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"   
+                    
   /player/game/{id}:
       get:
         tags:
@@ -1495,56 +1615,6 @@ paths:
                       enum:
                         - notification
                         - Error
-  
-  /player/cashier/custom/{transtype}:
-    get:
-      summary: Custom cashier
-      tags:
-        - Cashier
-        - Player
-        - Protected
-      description: >
-        Lists all available deposit and withdraw methods for the active player
-        with urls to deposit/withdraw forms
-
-        ### Possible error codes (resultCode): payment_processor_invalid_parameters
-      parameters:
-        - $ref: "#/parameters/Session"
-        - name: transtype
-          in: path
-          required: true
-          type: string
-          enum:
-            - deposit
-            - withdrawal
-            - both
-          
-          description: deposit or withdrawal, or both
-        - name: reUrl
-          in: query
-          required: true
-          type: string
-          description: Return url.
-      responses:
-        '200':
-          description: Payment url
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              response:
-                type: object
-                properties:
-                  deposit_methods:
-                    $ref: "#/definitions/PaymentMethods"
-                  withdraw_methods:
-                    $ref: "#/definitions/PaymentMethods"
-        400: 
-          $ref : "#/responses/Error"
-        401:
-          $ref : "#/responses/Error"
-          
 
   /player/cashier/custom/fields/{transtype}:
     get:
@@ -1560,6 +1630,11 @@ paths:
         Possible error codes (resultCode): payment_processor_invalid_parameters, payment_processor_error
       parameters:
         - $ref: "#/parameters/Session"
+        - name: x-language
+          in: header
+          required: false
+          type: string
+          description: Defaults to en_GB
         - name: transtype
           in: path
           required: true
@@ -1578,17 +1653,21 @@ paths:
             properties:
               info:
                 $ref: "#/definitions/Info"
-              response:
+              data:
                 type: object
                 properties:
                   deposit_methods:
-                    $ref: "#/definitions/paymentCategories"
+                    type: array
+                    items:
+                      $ref: "#/definitions/paymentMethod"
                   withdraw_methods:
-                    $ref: "#/definitions/paymentCategories"
+                    type: array
+                    items:
+                      $ref: "#/definitions/paymentMethod"
         401:
           $ref : "#/responses/Error"
-
-  /player/cashier/payment/{paymentmethod}:
+  
+  /player/cashier/payment/{processor}/{method}/{type}:
     post:
       summary: Payment submit form
       tags:
@@ -1600,17 +1679,35 @@ paths:
         Possible error codes (resultCode): payment_processor_invalid_parameters, payment_processor_error
       parameters:
         - $ref: "#/parameters/Session"
+        - name: x-language
+          in: header
+          required: false
+          type: string
+          description: Defaults to en_GB
         - name: body
           in: body
           required: true
           description: list off all fields to be posted
           schema:
-            $ref: "#/definitions/FieldDef"
-        - name: paymentmethod
+            $ref: "#/definitions/PaymentSubmit"
+        - name: processor
+          in: path
+          required: true
+          type: string
+          description: payment processor (paymentiq,..)
+        - name: method
           in: path
           required: true
           type: string
           description: payment method
+        - name: type
+          in: path
+          required: true
+          type: string
+          enum:
+            - deposit
+            - withdrawal
+          description: deposit/withdrawal
       responses:
         '200':
           description: success output
@@ -1619,32 +1716,84 @@ paths:
             properties:
               info:
                 $ref: "#/definitions/Info"
-              response:
+              data:
                 type: object
                 properties:
-                  type: 
-                    description: type of response
-                    type: string
-                    enum:
-                      - complete
-                      - redirect
-                  message:
-                    type: string
-                    description: returned message (optional)
-                  method:
-                    type: string
-                    description: type of method (optional)
-                    enum:
-                      - POST
-                      - GET
-                  url: 
-                    type: string
-                    description: url to post data or redirect url (optional)
-                  parameters:
+                  redirect:
+                    description: a redirect object
                     type: object
-                    description: list of parameters to be sended (optional)
+                    properties:
+                      method:
+                        type: string
+                        description: HTTP method to use when redirecting
+                        enum:
+                          - POST
+                          - GET
+                      container: 
+                        type: string
+                        description: a container to use (iFrame or window)
+                        enum:
+                          - iframe
+                          - window
+                      url:
+                        type: string
+                        description: a redirect url
+                      parameters:
+                        type: object
+                        description: params to include in redirect url 
+                      html:
+                        type: string
+                        description: string of HTML to display
+                      width:
+                        type: string
+                        description: the width in pixels of redirect container
+                      height:
+                        type: string
+                        description: the height in pixels of redirect container
+                  messages:
+                    description: a list of messages
+                    type: array
+                    items:
+                      $ref: "#/definitions/TransMessage"
+                  status: 
+                    description: states of transaction
+                    type: string
+                    enum:
+                      - redirect
+                      - complete
         401:
-          $ref : "#/responses/Error"
+          $ref: "#/responses/InvalidPaymentdata"
+
+  /player/cashier/status/{transactionid}:
+    get:
+      summary: get the information about a particular payment transaction
+      tags: 
+        - Cashier
+        - Player
+        - Protected
+      description: get the information about a particular payment transaction from the payment processor
+      parameters:
+        - name: transactionid
+          in: path
+          required: true
+          type: string
+          description: id of the transaction we need status of
+      responses:
+        '200':
+          description: Transaction info
+          schema:
+            type: object
+            properties:
+              state:
+                type: string
+                description: transaction state
+              messages:
+                description: a list of messages
+                type: array
+                items:
+                  $ref: "#/definitions/TransMessage"
+        '404':
+          description: transaction with transactionid not found (TBD)
 
   /player/cashier/transactions/{operation}/{processor}:
     get:
@@ -1726,6 +1875,7 @@ paths:
         - Player
         - Cashier
         - Protected
+        - Unimplemented
       summary: Retrieve the players payment accounts
       description: >
         Retrieves all accounts for the player. These accounts, with their ids,
@@ -1767,38 +1917,18 @@ paths:
           
         400:
           description: Error
-      
-  /player/page/{page}: 
+  
+  /player/limits:
     get:
-      tags:
-        - Player
-        - Cashier
-        - Protected
-        - Deprecated
-      summary: Player iframe pages
-      description: >
-        Possible error codes (resultCode): page_not_found
+      tags: 
+      - Limits
+      summary: Player limits / restrictions
       parameters:
         - $ref: "#/parameters/Session"
-        - name: page
-          in: path
-          required: true
-          type: string
-          enum:
-            - profile
-            - cashier
-            - register
-          description: 'Options profile, cashier, register'
-        - name: lang
-          in: query
-          description: Set page language, defaults to en_GB
-          required: false
-          default: en_GB
-          type: string
       responses:
-        '200':
-          description: Iframe url
-          schema:
+        200:
+          description : Player limits
+          schema: 
             type: object
             properties:
               info:
@@ -1806,10 +1936,148 @@ paths:
               data:
                 type: object
                 properties:
-                  page:
-                    type: string
-        '401':
-          $ref: '#/responses/Info'
+                  time:
+                    type: object
+                    description: Session time limit
+                    properties:
+                      amount:
+                        type: number
+                        description: Session timeout limit in secconds
+                      bet:
+                        type: object
+                        description: Bet limit
+                        properties:
+                          amount:
+                            type: number
+                            description: Bet amount limit
+                          interval:
+                            type: string
+                            enum:
+                              - day
+                              - week
+                              - month
+                      loss:
+                        type: object
+                        description: Loss limit
+                        properties:
+                          amount:
+                            type: number
+                            description: Loss amount limit
+                          interval:
+                            type: string
+                            enum:
+                              - day
+                              - week
+                              - month
+                      deposit:
+                        type: object
+                        description: Daily deposit limit
+                        properties:
+                          amount:
+                            type: number
+                            
+  /player/limits/{type}:
+    post:
+      tags: 
+        - Limits
+      summary: Set player limit / restriction
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: type
+          in: path
+          type: string
+          required: true
+          enum: 
+            - time
+            - bet
+            - loss
+            - deposit
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              password:
+                type: string
+                description: Player password
+              amount:
+                type: number
+                description: bet/loss/desposit (money), time (seconds)
+              interval:
+                type: string
+                description: Required only by bet/loss
+                enum:
+                  - day
+                  - week
+                  - month
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          $ref: '#/responses/Error'
+          
+  /player/freeze:
+    post:
+      tags: 
+        - Limits
+      summary: Freez player account for number rof days
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              password:
+                type: string
+                description: Player password
+              amount:
+                type: number
+                description: Number of days
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          $ref: '#/responses/Error'
+          
+  /player/deactivate:
+    post:
+      tags: 
+        - Limits
+      summary: Deactivate player account
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              password:
+                type: string
+                description: Player password
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          $ref: '#/responses/Error'
   
   /validate:
     get:
@@ -2461,6 +2729,22 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/FieldInstance"
+          
+  PaymentSubmit:
+    description: |
+      Object for submitting a payment.
+    type: object
+    properties:
+      successUrl:
+        type: string
+        description: Return url in case of success
+      failureUrl:
+        type: string
+        description: Return url in case of failure
+      fields:
+        type: array
+        items:
+          $ref: "#/definitions/FieldInstance"
   
   PlayerSchema:
     type: object
@@ -2566,6 +2850,7 @@ definitions:
               - color
               - TAC
               - Country
+              - hidden
           dataType:
             $ref: "#/definitions/DataType"
         
@@ -2609,6 +2894,19 @@ definitions:
             type: array
             items:
               $ref: "#/definitions/DropDownValue"
+          encryption:
+            type: object
+            description: (optional) If field requires encryption
+            properties:
+              type:
+                type: string
+                description: for instance.. text/javascript
+              src:
+                type: string
+                description: url source of encryption
+              function:
+                type: string
+                description: function name
           validators:
             type: array
             items:
@@ -2727,138 +3025,6 @@ definitions:
         description: The size of each page, 0 if no paging.
         type: integer
 
-   
-  
-  PaymentMethods:
-    description: Payment methods available
-    type: object
-    properties:
-      bank_transfers:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      credit_cards:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      debit_cards:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      instant_banking:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      e_wallets:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      prepaid_cards:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      money_orders:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      bitcoins:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      mobile_banks:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-      other:
-        type: array
-        items:
-            $ref: "#/definitions/PaymentMethod"
-  PaymentMethod:
-    description : Information regarding an available deposit method.
-    type: object
-    properties:
-      name:
-        type: string
-      code:
-        type: string
-        description: Code representing the deposit type, to allow for consumer translations.
-      text:
-        type: string
-        description: Payment Text
-      timeStr:
-        type: string
-        description: String decription of the transacction time
-      isInstant:
-        type: boolean
-        default: false
-        description: is the transaction instantly credited/debited to the account
-      fee:
-        type: string
-        description: Text decription of the fee.
-      limits:
-        description: Information about limits for the deposit method, as text.
-        type: object
-        properties:
-          minAmountStr:
-            type: string
-          maxAmountStr:
-            type: string
-          minAmountVal:
-            type: number
-          maxAmountVal:
-            type: number
-      url:
-        type: string
-        description: url link to the payment method
-      image:
-        type: string
-        description: URL to full size image for this payment provider.
-
-  paymentCategories:
-    description: Payment categories
-    type: object
-    properties:
-      bank_transfers:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      credit_cards:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      debit_cards:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      instant_banking:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      e_wallets:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      prepaid_cards:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      money_orders:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      bitcoins:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      mobile_banks:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-      other:
-        type: array
-        items:
-            $ref: "#/definitions/paymentMethod"
-
   paymentMethod:
     description : Information regarding an available payment method.
     type: object
@@ -2868,6 +3034,23 @@ definitions:
       code:
         type: string
         description: Code representing the payment method type, to allow for consumer translations.
+      processor:
+        type: string
+        description: payment processor used for this method (paymentiq,...)
+      category:
+        type: string
+        description: A category of payment
+        enum:
+          - bank_transfers
+          - credit_cards
+          - debit_cards
+          - instant_banking
+          - e_wallets
+          - prepaid_cards
+          - money_orders
+          - bitcoins
+          - mobile_banks
+          - other
       text:
         type: string
         description: Payment Text
@@ -2900,20 +3083,12 @@ definitions:
         type: object
         description: Information about fields for payment method
         properties: 
-          method:
-            description: avaliable methods
-            enum:
-              - POST
-            type: string
-          url:
-            description: url to post data
-            type: string
           fields:
             type: array
             description: list off all fields to be posted
             items:
-              $ref: "#/definitions/FieldDef"        
-        
+              $ref: "#/definitions/FieldDef"  
+  
   GameTransaction:
     description: Transaction
     type: object
@@ -2941,8 +3116,55 @@ definitions:
       system:
         type: string
       accountuser:
-        type: string 
-          
+        type: string
+
+  TransMessage:
+    description: Transaction message
+    type: object
+    properties:
+      label:
+        type: string
+        description: Description
+      value:
+        type: string
+        description: Value
+      key:
+        type: string
+        description: Optional
+  
+  Bonus:
+    description: Bonus information
+    type: object
+    properties:
+      bonus_id:
+        description: bonus id
+        type: string
+      name:
+        description: Bonus name
+        type: string
+      stub:
+        description: Slug for bonus in CMS
+        type: string
+      valid_until:
+        description: Bonus valid until date
+        type: string
+      valid_from:
+        description: Bonus valid from date
+        type: string
+      deposit_min:
+        description: Minimal deposit to achieve bonus
+        type: number
+      deposit_max:
+        description: Maximum deposit to achieve bonus
+        type: number
+      payment_methods:
+        description: Payment methods for which this bonus is applicable
+        type: array
+        items:
+          type: string
+      activated_for_player:
+        description: Is this bonus already activated for this player
+        type: boolean
 
 responses:
   InvalidPlayerdata:
@@ -2967,6 +3189,27 @@ responses:
                   items:
                       $ref: "#/definitions/InvalidField"
 
+  InvalidPaymentdata:
+    description: Information returned when payment fails
+    schema:
+          type: object
+          properties:
+            info:
+              $ref: "#/definitions/Info"
+            data:
+              type: object
+              properties:
+                record:
+                  description: Additional information about record level invalidation.
+                  type: array
+                  items:
+                    $ref: "#/definitions/Error"
+            
+                fields:
+                  description: an array of invalid fields, with an array of the invalid validators.
+                  type: array
+                  items:
+                      $ref: "#/definitions/InvalidField"
   
   Error:
     description: Error Information
@@ -2996,6 +3239,7 @@ responses:
           responseTime:
             type: number
             format: float
+            
 parameters:
   Session:
     name: x-igp-session
