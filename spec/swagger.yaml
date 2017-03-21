@@ -137,6 +137,8 @@ tags:
     description: Endpoints that have been put out of production, will not be implemented
   - name: Terms of Use
     description : Endpoints related to Terms of Use.
+  - name: Lists
+    description: Various lists and reports
 host: demo-api.igp.cloud
 schemes:
   - https
@@ -161,7 +163,7 @@ paths:
           headers:
             "x-error-code":
               type: string
-              description: error cod
+              description: error code
     get:
       tags:
         - Game Library
@@ -1992,6 +1994,82 @@ paths:
               type: boolean
         400: 
           description: The username was not submitted correctly, can not validate the username.
+          
+  /lists/widgets/{action}/{type}:
+    get:
+      tags:
+        - Lists
+      summary: |
+        Can be used to obtain top winners, top losers or latest winners.
+        'Latest losers' combination is not yet implemented, and it will not work.
+      parameters:
+        - name: action
+          in: path
+          required: true
+          type: string
+          description: Can be one of the following - `top` or `latest`
+        - name: type
+          in: path
+          required: true
+          type: string
+          description: Can be one of the following - `winners` or `losers`
+        - name: count
+          in: query
+          required: false
+          type: integer
+          default: 10
+          description: Changes amount of results returned
+        - name: gameId
+          in: query
+          required: false
+          type: string
+          description: If provided, results will be limited to chosen game
+      responses:
+        '200':
+          description: Response object
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: Player id
+                    amount:
+                      type: number
+                      description: Depends on action and type
+                    firstName:
+                      type: string
+                    lastName: 
+                      type: string
+                    username:
+                      type: string
+                    nickname:
+                      type: string
+                    country:
+                      type: string
+                    registrationDate:
+                      type: string
+                      format: date-time
+                    gender:
+                      type: string
+                      enum:
+                        - M
+                        - F
+                    balance:
+                      type: number
+                      description: Player's current balance
+                    isOnline:
+                      type: boolean
+        '501':
+          description: |
+            In case of latest losers.
+            Latest losers feature is not yet implemented
 
 definitions:
 
@@ -2863,7 +2941,7 @@ definitions:
       system:
         type: string
       accountuser:
-        type: string        
+        type: string 
           
 
 responses:
