@@ -776,7 +776,49 @@ paths:
             properties:
               info:
                 $ref: "#/definitions/Info"   
-                    
+  /player/bonus/deactivate:
+    post:
+      tags:
+        - Player
+        - Protected
+        - Bonus
+      summary: Deactivates currently selected bonus. Can only work if bonus is not yet applied
+      parameters:
+        - $ref: "#/parameters/Session"
+      responses:
+        200:
+          description: Bonus validated
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+  /player/remaining/deposit:
+    get:
+      tags:
+        - Player
+        - Protected
+      summary: Player remaining deposits regarding deposits limit
+      parameters:
+        - $ref: "#/parameters/Session"
+      responses:
+        200:
+          description: Temaining deposits
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                properties:
+                  amount_current:
+                    type: number
+                  amount_available: 
+                    type: number
+                  limit:
+                    type: number
+                  interval:
+                    type: string                
   /player/game/{id}:
       get:
         tags:
