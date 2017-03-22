@@ -863,6 +863,9 @@ paths:
                 data:
                   type: object
                   properties:
+                    license:
+                      type: string
+                      description: License name
                     url:
                       type: string
                       description: Game url
@@ -2574,6 +2577,8 @@ definitions:
         type: boolean
       ishomelicencesend:
         type: boolean
+      license:
+        type: string
       order:
         type: integer
         description: The defined sort order for the game.
