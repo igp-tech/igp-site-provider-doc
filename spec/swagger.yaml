@@ -104,7 +104,7 @@ info:
       * new_password_missing - new password is missing
       * payment_processor_error - payment processor error
       * payment_processor_invalid_parameters - invalid input parameters
-      * account_blocked - player account is blocked
+      * account_blocked - player account is blocked, usually by too many fail login attempts (contact administrator for unblock)
       * account_deactivated - player account was deactivated by their request
       * account_frozen - player account is temporary frozen
       * account_pending - player activation not complete
