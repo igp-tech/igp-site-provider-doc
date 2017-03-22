@@ -652,6 +652,15 @@ paths:
                   touValid:
                     description: Has the user accepted the current TOU
                     type: boolean
+                  performRealityCheck:
+                    description: Does player need to perform reality check
+                    type: boolean
+                  playerTOU:
+                    description: Player accepted version of TOU
+                    type: string
+                  portalTOU:
+                    description: Portal version of TOU
+                    type: integer
   
   /player/bonus:
     get:
@@ -2338,6 +2347,61 @@ paths:
           description: |
             In case of latest losers.
             Latest losers feature is not yet implemented
+            
+            
+            
+  /licence/mga/realityCheckData:
+    get:
+      tags:
+        - Player
+        - Protected
+      summary: Gets the players reality check data
+      parameters:
+        - $ref: "#/parameters/Session"
+      responses:
+        '200':
+          description: Player reality check data
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  bet:
+                    description: Total bets amount
+                    type: string
+                  win:
+                    description: Total wins amount
+                    type: string
+                  net:
+                    description: Wins - bets
+                    type: string
+                  timePlayed:
+                    description: Player session time
+                    type: string
+  
+              
+  /licence/mga/confirmRealityCheck:
+    get:
+      tags:
+        - Player
+        - Protected
+      summary: Flag player as reality checked
+      parameters:
+        - $ref: "#/parameters/Session"
+      responses:
+        '200':
+          description: Flag player as reality checked
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                  description: is player flaged as reality checked
+                  type: boolean        
 
 definitions:
 
@@ -2465,6 +2529,8 @@ definitions:
       mobile:
         type: boolean
       play_for_fun_supported:
+        type: boolean
+      ishomelicencesend:
         type: boolean
       order:
         type: integer
