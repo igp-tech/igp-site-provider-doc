@@ -2172,7 +2172,6 @@ paths:
         - Validation
       description: Retrieves the Javascript code which can be used to validate the designated type of data.
       parameters:
-        - $ref: "#/parameters/AnonSession"
         - name: validatorKey
           in: path
           required: true
