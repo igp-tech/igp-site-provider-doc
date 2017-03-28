@@ -1841,8 +1841,13 @@ paths:
               state:
                 type: string
                 description: transaction state
+              errors:
+                description: a list of error messages
+                type: array
+                items:
+                  $ref: "#/definitions/Error"
               messages:
-                description: a list of messages
+                description: a list of success messages
                 type: array
                 items:
                   $ref: "#/definitions/TransMessage"
