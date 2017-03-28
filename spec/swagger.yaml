@@ -606,12 +606,6 @@ paths:
       summary: Get/start anonymous session
       description: >
         Required for captcha validation/registration process
-      parameters:
-        - name: x-igp-session
-          in: header
-          description: If provided request will just create/update provided session
-          required: false
-          type: string
       responses:
         '200':
           description: Anonymous session
