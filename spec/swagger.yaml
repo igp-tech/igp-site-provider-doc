@@ -1838,14 +1838,19 @@ paths:
           schema:
             type: object
             properties:
-              state:
+              status:
                 type: string
-                description: transaction state
-              errors:
+                description: transaction status
+              record:
                 description: a list of error messages
                 type: array
                 items:
                   $ref: "#/definitions/Error"
+              fields:
+                description: a list of fields errors
+                type: array
+                items:
+                  $ref: "#/definitions/InvalidField"
               messages:
                 description: a list of success messages
                 type: array
