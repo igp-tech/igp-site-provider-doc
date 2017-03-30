@@ -2722,6 +2722,9 @@ definitions:
       ref_code:
         type: string
         description: Referral code (optional)
+      a_aid:
+        type: string
+        description: Affiliate code (optional)
         
   CorePlayerUpdate:
     description: >
