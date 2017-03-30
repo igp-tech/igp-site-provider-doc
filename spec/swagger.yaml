@@ -2719,6 +2719,9 @@ definitions:
         description: two letter country code in lowercase
       captcha:
         type: string
+      ref_code:
+        type: string
+        description: Referral code (optional)
         
   CorePlayerUpdate:
     description: >
