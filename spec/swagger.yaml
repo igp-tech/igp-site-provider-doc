@@ -2848,6 +2848,12 @@ definitions:
     properties:
       terms:
         type: number
+      affiliate_system:
+        type: string
+        description: Affiliate system (optional)
+      affiliate_id:
+        type: string
+        description: Affiliate id (optional)
       schemaCode:
         $ref: "#/definitions/SchemaCode"
       fields:
