@@ -661,6 +661,33 @@ paths:
                   portalTOU:
                     description: Portal version of TOU
                     type: integer
+                    
+                    
+  /player/activate/:token:
+    get:
+      tags:
+        - Player
+        - Protected
+      summary: Activates player account
+      parameters:
+        - $ref: "#/parameters/Session"
+      responses:
+        '200':
+          description: Activation status
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+
+        '400':
+          description: Activation failed
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+
   
   /player/bonus:
     get:
