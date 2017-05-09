@@ -606,12 +606,6 @@ paths:
       summary: Get/start anonymous session
       description: >
         Required for captcha validation/registration process
-      parameters:
-        - name: x-igp-session
-          in: header
-          description: If provided request will just create/update provided session
-          required: false
-          type: string
       responses:
         '200':
           description: Anonymous session
@@ -1865,11 +1859,21 @@ paths:
           schema:
             type: object
             properties:
-              state:
+              status:
                 type: string
-                description: transaction state
+                description: transaction status
+              record:
+                description: a list of error messages
+                type: array
+                items:
+                  $ref: "#/definitions/Error"
+              fields:
+                description: a list of fields errors
+                type: array
+                items:
+                  $ref: "#/definitions/InvalidField"
               messages:
-                description: a list of messages
+                description: a list of success messages
                 type: array
                 items:
                   $ref: "#/definitions/TransMessage"
@@ -2199,7 +2203,6 @@ paths:
         - Validation
       description: Retrieves the Javascript code which can be used to validate the designated type of data.
       parameters:
-        - $ref: "#/parameters/AnonSession"
         - name: validatorKey
           in: path
           required: true
@@ -2743,6 +2746,15 @@ definitions:
         description: two letter country code in lowercase
       captcha:
         type: string
+      ref_code:
+        type: string
+        description: Referral code (optional)
+      affiliate_system:
+        type: string
+        description: Affiliate system (optional)
+      affiliate_id:
+        type: string
+        description: Affiliate id (optional)
         
   CorePlayerUpdate:
     description: >
@@ -2863,6 +2875,12 @@ definitions:
     properties:
       terms:
         type: number
+      affiliate_system:
+        type: string
+        description: Affiliate system (optional)
+      affiliate_id:
+        type: string
+        description: Affiliate id (optional)
       schemaCode:
         $ref: "#/definitions/SchemaCode"
       fields:
