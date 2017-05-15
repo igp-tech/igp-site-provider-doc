@@ -2478,6 +2478,93 @@ paths:
                   description: is player flaged as reality checked
                   type: boolean        
 
+
+
+  /player/freeround-programs:
+    get:
+      tags: 
+        - Programs
+      summary: Gets all active programs definition and status of programs for a player
+      parameters:
+        - $ref: "#/parameters/Session"
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/Program"
+        400:
+          $ref: '#/responses/Error'
+
+
+  /player/freeround-programs/{slug}:
+    get:
+      tags: 
+        - Programs
+      summary: Gets active program definition and status of a player, for a specific program by slug ( code )
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: slug
+          in: path
+          required: true
+          type: string
+          description: program unique identifier, a slug
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                $ref: "#/definitions/Program"
+        400:
+          $ref: '#/responses/Error'
+
+
+  /player/freeround-programs/{slug}/allocate:
+    post:
+      tags: 
+        - Programs
+      summary: Allocates new set of freeround for a player based definition of the award inside a program. 
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: slug
+          in: path
+          required: true
+          type: string
+          description: program unique identifier, a slug
+        - name: game
+          in: body
+          required: true
+          type: integer
+          description: a game id
+        - name: rounds
+          in: body
+          required: true
+          type: integer
+          description: a number of freerounds that player wants to allocate
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                $ref: "#/definitions/Program"
+        400:
+          $ref: '#/responses/Error'
+
+
 definitions:
 
   PlayerAccount:
@@ -3323,6 +3410,57 @@ definitions:
       activated_for_player:
         description: Is this bonus already activated for this player
         type: boolean
+
+  Program:
+    description: A program definition with current status from a player perspective
+    type: object
+    properties:
+      state:
+        type: string
+        descrition: can be locked/unlocked/active/completed
+      slug:
+        type: string
+      rounds:
+        type: integer
+        description: count of overall freerounds on the award scope
+      games:
+        type: array
+        description: array of game ids
+      awards:
+        type: array
+        description: list of all awards
+        items:
+          $ref: "#/definitions/ProgramAward"  
+
+  ProgramAward:
+    description: An award inside a program. 1 program can have more that 1 award
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      type:
+        type: string
+      instances:
+        type: array
+        description: list of all allocated freerounds, called 'instances'
+        items:
+          $ref: "#/definitions/ProgramAwardInstance" 
+
+  ProgramAwardInstance:
+    description: An instance, freeround that was alocated on a game with given count of freerounds
+    type: object
+    properties:
+      game:
+        type: string
+        description: a game id
+      rounds:
+        type: integer
+      completed:
+        type: boolean
+
+
 
 responses:
   InvalidPlayerdata:
