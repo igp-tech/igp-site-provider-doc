@@ -145,6 +145,8 @@ tags:
     description : Endpoints related to Bonuses
   - name: Lists
     description: Various lists and reports
+  - name: Freerounds
+    description: Freerounds award program
 host: demo-api.igp.cloud
 schemes:
   - https
@@ -2483,7 +2485,7 @@ paths:
   /player/freeround-programs:
     get:
       tags: 
-        - Programs
+        - Freerounds
       summary: Gets all active programs definition and status of programs for a player
       parameters:
         - $ref: "#/parameters/Session"
@@ -2506,7 +2508,7 @@ paths:
   /player/freeround-programs/{slug}:
     get:
       tags: 
-        - Programs
+        - Freerounds
       summary: Gets active program definition and status of a player, for a specific program by slug ( code )
       parameters:
         - $ref: "#/parameters/Session"
@@ -2527,12 +2529,13 @@ paths:
                 $ref: "#/definitions/Program"
         400:
           $ref: '#/responses/Error'
-
+          
+  
 
   /player/freeround-programs/{slug}/allocate:
     post:
       tags: 
-        - Programs
+        - Freerounds
       summary: Allocates new set of freeround for a player based definition of the award inside a program. 
       parameters:
         - $ref: "#/parameters/Session"
@@ -2541,16 +2544,18 @@ paths:
           required: true
           type: string
           description: program unique identifier, a slug
-        - name: game
+        - name: payload
           in: body
-          required: true
-          type: integer
-          description: a game id
-        - name: rounds
-          in: body
-          required: true
-          type: integer
-          description: a number of freerounds that player wants to allocate
+          schema: 
+            type: object
+            properties:
+              game:
+                type: string
+                description: a game id
+              rounds:
+                type: number
+                format: integer
+                description: a number of freerounds that player wants to allocate
       responses:
         200:
           description : Success
@@ -2563,6 +2568,7 @@ paths:
                 $ref: "#/definitions/Program"
         400:
           $ref: '#/responses/Error'
+
 
 
 definitions:
@@ -3417,15 +3423,18 @@ definitions:
     properties:
       state:
         type: string
-        descrition: can be locked/unlocked/active/completed
+        enum:
+          - active
+          - inactive
+          - completed
       slug:
+        type: string
+        description: UNIQUE name of the program
+      playerId:
         type: string
       rounds:
         type: integer
         description: count of overall freerounds on the award scope
-      games:
-        type: array
-        description: array of game ids
       awards:
         type: array
         description: list of all awards
@@ -3436,12 +3445,21 @@ definitions:
     description: An award inside a program. 1 program can have more that 1 award
     type: object
     properties:
-      id:
+      slug:
         type: string
-      name:
-        type: string
+        description: Unique name of award inside freeround program, e.g. `registration`, `firstDeposit` etc.
       type:
         type: string
+        enum:
+          - locked
+          - unlocked
+          - active
+          - completed
+      games:
+        type: array
+        description: array of game ids
+        items:
+          type: string
       instances:
         type: array
         description: list of all allocated freerounds, called 'instances'
@@ -3457,8 +3475,10 @@ definitions:
         description: a game id
       rounds:
         type: integer
+        description: Number of freerounds assigned to this game
       completed:
         type: boolean
+        description: Tells if freerounds have been completed for this game
 
 
 
