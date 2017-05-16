@@ -3431,9 +3431,6 @@ definitions:
         description: UNIQUE name of the program
       playerId:
         type: string
-      rounds:
-        type: integer
-        description: count of overall freerounds on the award scope
       awards:
         type: array
         description: list of all awards
@@ -3454,6 +3451,9 @@ definitions:
           - unlocked
           - active
           - completed
+      rounds:
+        type: integer
+        description: count of overall freerounds on the award scope
       games:
         type: array
         description: array of game ids
