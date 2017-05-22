@@ -2596,8 +2596,17 @@ paths:
             properties:
               info:
                 $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  sessionId:
+                    type: string
+                    description: new x-igp-session
         400:
           $ref: '#/responses/Error'
+
+
+
 
   /service/player/forceLogin:
     post:
