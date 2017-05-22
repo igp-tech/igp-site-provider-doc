@@ -147,6 +147,8 @@ tags:
     description: Various lists and reports
   - name: Freerounds
     description: Freerounds award program
+  - name: Auth hub
+    description: Endpoints related to Auth hub 
 host: demo-api.igp.cloud
 schemes:
   - https
@@ -2569,7 +2571,61 @@ paths:
         400:
           $ref: '#/responses/Error'
 
+  /player/authhub/login:
+    post:
+      tags: 
+        - Auth hub
+      summary: Initiates process to transfer player to another CE
+      parameters:
+        - name: payload
+          in: body
+          schema: 
+            type: object
+            properties:
+              authType:
+                type: string
+                description: type of login/switch ('currency')
+              rounds:
+                type: string
+                description: login using what ('BTC'/'EUR')
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          $ref: '#/responses/Error'
 
+  /service/player/forceLogin:
+    post:
+      tags: 
+        - Auth hub
+      summary: Used by authHub to force login player to CE
+      parameters:
+        - name: payload
+          in: body
+          schema: 
+            type: object
+            properties:
+              playerId:
+                type: string
+                description: player id
+              portalId:
+                type: string
+                description: portal id
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          $ref: '#/responses/Error'
 
 definitions:
 
