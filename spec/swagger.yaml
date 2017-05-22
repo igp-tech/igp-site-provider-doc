@@ -2577,6 +2577,7 @@ paths:
         - Auth hub
       summary: Initiates process to transfer player to another CE
       parameters:
+        - $ref: "#/parameters/Session"
         - name: payload
           in: body
           schema: 
@@ -2633,6 +2634,40 @@ paths:
             properties:
               info:
                 $ref: "#/definitions/Info"
+        400:
+          $ref: '#/responses/Error'
+          
+          
+  /player/loyaltyPoints:
+    get:
+      tags: 
+        - Auth hub
+      summary: returns player loyalty points for this SP/CE
+      parameters:
+        - $ref: "#/parameters/Session"
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  playerId:
+                    type: string
+                    description: player id
+                  eventName:
+                    type: string
+                    description: eventName
+                  data:
+                    type: object
+                    properties:
+                      loyaltyPoints:
+                        type: string
+                        description: Total number of player loyalty points
         400:
           $ref: '#/responses/Error'
 
