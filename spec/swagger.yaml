@@ -2586,7 +2586,7 @@ paths:
               authType:
                 type: string
                 description: type of login/switch ('currency')
-              rounds:
+              using:
                 type: string
                 description: login using what ('BTC'/'EUR')
       responses:
