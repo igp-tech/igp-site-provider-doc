@@ -1834,6 +1834,16 @@ paths:
                     type: array
                     items:
                       $ref: "#/definitions/TransMessage"
+                  bitcoin_wallet:
+                    description: a bitcoin wallet object
+                    type: object
+                    properties:
+                      qr_image:
+                        type: string
+                        description: url to a QR code image encoding the wallet and amount
+                      address:
+                        type: string
+                        description: bitcoin wallet address
                   status: 
                     description: states of transaction
                     type: string
