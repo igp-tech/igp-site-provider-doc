@@ -16,7 +16,7 @@ info:
     For each portal, there can be multiple playerSchemas, although it is envisioned that all sites will have three:
     
     - registrationFull
-    - registrationShort
+    - registrationShortapi
     - playerProfile
     
     The schemas return datamodel and formview data for dynamic rendering of all forms, and include additional data
@@ -149,6 +149,8 @@ tags:
     description: Freerounds award program
   - name: Auth hub
     description: Endpoints related to Auth hub 
+  - name: Cache
+    description: Endpoints for managing the cache
 host: demo-api.igp.cloud
 schemes:
   - https
@@ -2636,6 +2638,7 @@ paths:
               portalId:
                 type: string
                 description: portal id
+        - $ref: "#/parameters/ApiKey"
       responses:
         200:
           description : Success
@@ -2700,6 +2703,7 @@ paths:
           in: header
           required: true
           type: string
+        - $ref: "#/parameters/ApiKey"
       responses:
         200:
           description : Success
@@ -2730,6 +2734,31 @@ paths:
                           description: Portal id           
         400:
           $ref: '#/responses/Error'
+          
+  /service/cache/clear:
+    get:
+      tags:
+        - Cache
+      parameters:
+        - $ref: "#/parameters/ApiKey"
+      summary: Clears cache on site provider and igp-internal-apis
+      responses:
+        200:
+          description: Cache cleared on both IGP site provider and internal-apis
+          schema:
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        500:
+          description: |
+            Error while clearing cache in igp-internal-apis.
+            However, cache on site provider should be cleared
+          schema:
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                description: Response from igp-internal-apis
 
 
 definitions:
@@ -3733,5 +3762,13 @@ parameters:
     name: SchemaCode
     in: path
     description: A session Code
+    required: true
+    type: string
+  ApiKey:
+    name: api-key
+    in: header
+    description: |
+      Api key required to access or modify a resource.
+      Can also be used as _x-api-key_
     required: true
     type: string
