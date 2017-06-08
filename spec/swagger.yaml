@@ -456,7 +456,10 @@ paths:
               info:
                 $ref: "#/definitions/Info"
               data:
-                $ref: '#/definitions/Player'
+                allOf:
+                  - description: >
+                      Player data flattened form. Will be retuned **if and only if** `autologin` parameter was set to `true`. In this case, it will include _sessionid_ field
+                  - $ref: '#/definitions/Player'
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
   /player/extended:
@@ -513,7 +516,10 @@ paths:
               info:
                 $ref: "#/definitions/Info"
               data:
-                $ref: '#/definitions/PlayerData'
+                allOf:
+                  - description: >
+                      Player data in form of _fieldInstances_. Will be retuned **if and only if** `autologin` parameter was set to `true`. In this case, it will include _sessionid_ fieldInstance
+                  - $ref: '#/definitions/PlayerData'
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
 
