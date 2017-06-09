@@ -457,8 +457,10 @@ paths:
                 $ref: "#/definitions/Info"
               data:
                 allOf:
-                  - description: >
-                      Player data flattened form. Will be retuned **if and only if** `autologin` parameter was set to `true`. In this case, it will include _sessionid_ field
+                  - properties:
+                      sessionId:
+                        type: string
+                        description: Will be returned only in case if portal supports autologin and if `autologin` param was set to `true` 
                   - $ref: '#/definitions/Player'
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
@@ -518,7 +520,12 @@ paths:
               data:
                 allOf:
                   - description: >
-                      Player data in form of _fieldInstances_. Will be retuned **if and only if** `autologin` parameter was set to `true`. In this case, it will include _sessionid_ fieldInstance
+                      Object for submitting updates to player profile data. Similar to PlayerRegistration, but it is hardcoded to the PlayerProfile schema.
+                    properties:
+                      sessionid: 
+                        type: string
+                        description: >
+                          Will be returned only in case if portal supports autologin and if `autologin` param was set to `true` 
                   - $ref: '#/definitions/PlayerData'
         '400' :
           $ref: "#/responses/InvalidPlayerdata"
