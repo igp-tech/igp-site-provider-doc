@@ -113,7 +113,7 @@ info:
       * token_expired - token expired
       * game_not_available
 
-  version: "2.4.10"
+  version: "2.4.11"
 tags:
   - name: Player
     description: |
@@ -3596,7 +3596,7 @@ definitions:
       name:
         description: Bonus name
         type: string
-      stub:
+      frontend_slug:
         description: Slug for bonus in CMS
         type: string
       valid_until:
