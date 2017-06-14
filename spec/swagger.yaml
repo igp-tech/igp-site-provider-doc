@@ -708,7 +708,7 @@ paths:
         - Player
         - Protected
         - Bonus
-      summary: Gets the available bonuses for a player
+      summary: Gets the available bonuses for a player. also gets active freeround-bonus programs if player haven't yet made a deposit.
       parameters:
         - $ref: "#/parameters/Session"
         - name: paymentmethod
@@ -3618,6 +3618,12 @@ definitions:
           type: string
       activated_for_player:
         description: Is this bonus already activated for this player
+        type: boolean
+      is_automatic:
+        description: mark a automatic bonus. player gets this bonus automatically on actions ( like first deposit )
+        type: boolean
+      is_bonus_program:
+        description: bonus that is a bonus program. when activated, player is entering a freeround bonus program
         type: boolean
 
   Program:
