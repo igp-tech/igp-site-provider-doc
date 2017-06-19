@@ -2136,7 +2136,7 @@ paths:
         400:
           $ref: '#/responses/Error'
         412:
-          description: Precondition failed
+          description: limit_below_zero
           schema:
             type: object
             properties:
