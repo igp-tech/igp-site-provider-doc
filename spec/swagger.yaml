@@ -3195,6 +3195,9 @@ definitions:
       affiliate_id:
         type: string
         description: Affiliate id (optional)
+      newsletter:
+        type: boolean
+        description: Should player receive newsletter
       schemaCode:
         $ref: "#/definitions/SchemaCode"
       fields:
