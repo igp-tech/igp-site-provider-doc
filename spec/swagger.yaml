@@ -2376,7 +2376,7 @@ paths:
         400: 
           description: The username was not submitted correctly, can not validate the username.
           
-  /lists/widgets/{action}/{type}:
+  /lists/winnings/{action}/{type}:
     get:
       tags:
         - Lists
