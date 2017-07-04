@@ -1059,7 +1059,7 @@ paths:
               info:
                 $ref: "#/definitions/Info"
         401:
-          description: Invalid session
+          description: Invalid sessionlimit
           schema:
             type: object
             properties:
@@ -2135,6 +2135,24 @@ paths:
                 $ref: "#/definitions/Info"
         400:
           $ref: '#/responses/Error'
+        412:
+          description: limit_below_zero
+          schema:
+            type: object
+            properties:
+              info:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default: false
+                  resultCode:
+                    type: string
+                  message:
+                    type: string
+                  responseTime:
+                    type: number
+                    format: float
           
   /player/freeze:
     post:
@@ -3177,6 +3195,9 @@ definitions:
       affiliate_id:
         type: string
         description: Affiliate id (optional)
+      newsletter:
+        type: boolean
+        description: Should player receive newsletter
       schemaCode:
         $ref: "#/definitions/SchemaCode"
       fields:
