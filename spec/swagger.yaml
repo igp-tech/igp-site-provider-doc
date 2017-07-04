@@ -2394,12 +2394,12 @@ paths:
         400: 
           description: The username was not submitted correctly, can not validate the username.
           
-  /lists/winnings/{action}/{type}:
+  /lists/{action}/{type}:
     get:
       tags:
         - Lists
       summary: |
-        Can be used to obtain top winners, top losers or latest winners.
+        Can be used to obtain top/latest winners, wins or losers.
         'Latest losers' combination is not yet implemented, and it will not work.
       parameters:
         - name: action
@@ -2411,7 +2411,7 @@ paths:
           in: path
           required: true
           type: string
-          description: Can be one of the following - `winners` or `losers`
+          description: Can be one of the following - `winners` or `wins` or `losers`
         - name: count
           in: query
           required: false
