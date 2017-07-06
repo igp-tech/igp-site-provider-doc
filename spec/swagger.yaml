@@ -2423,6 +2423,16 @@ paths:
           required: false
           type: string
           description: If provided, results will be limited to chosen game
+        - name: fromDate
+          in: query
+          required: false
+          type: string
+          description: If provided, results will be limited from this date
+        - name: toDate
+          in: query
+          required: false
+          type: string
+          description: If provided, results will be limited to this date
       responses:
         '200':
           description: Response object
@@ -2436,35 +2446,29 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
-                      type: string
-                      description: Player id
                     amount:
                       type: number
                       description: Depends on action and type
-                    firstName:
+                    timestamp:
                       type: string
-                    lastName: 
-                      type: string
-                    username:
-                      type: string
-                    nickname:
+                      description: Depends on action and type
+                    name:
                       type: string
                     country:
                       type: string
-                    registrationDate:
-                      type: string
-                      format: date-time
                     gender:
                       type: string
                       enum:
                         - M
                         - F
-                    balance:
-                      type: number
-                      description: Player's current balance
                     isOnline:
                       type: boolean
+                    gameid:
+                      type: string
+                    currencyCode:
+                      type: string
+                    currencySymbol:
+                      type: string
         '501':
           description: |
             In case of latest losers.
