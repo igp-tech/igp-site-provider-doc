@@ -2473,9 +2473,69 @@ paths:
           description: |
             In case of latest losers.
             Latest losers feature is not yet implemented
-            
-            
-            
+
+  /lists/ggr:
+
+    get:
+      tags:
+        - Lists
+      summary: |
+        Can be used to obtain GGR for time period
+      parameters:
+        - name: count
+          in: query
+          required: false
+          type: integer
+          default: 10
+          description: Changes amount of results returned
+        - name: fromDate
+          in: query
+          required: false
+          type: string
+          description: If provided, results will be limited from this date
+        - name: toDate
+          in: query
+          required: false
+          type: string
+          description: If provided, results will be limited to this date
+      responses:
+        '200':
+          description: Response object
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    amount:
+                      type: number
+                      description: Depends on action and type
+                    timestamp:
+                      type: string
+                      description: Depends on action and type
+                    name:
+                      type: string
+                    country:
+                      type: string
+                    gender:
+                      type: string
+                      enum:
+                        - M
+                        - F
+                    isOnline:
+                      type: boolean
+                    gameid:
+                      type: string
+                    currencyCode:
+                      type: string
+                    currencySymbol:
+                      type: string
+
+
   /licence/mga/realityCheckData:
     get:
       tags:
