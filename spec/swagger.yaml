@@ -2480,7 +2480,7 @@ paths:
       tags:
         - Lists
       summary: |
-        Can be used to obtain GGR for time period
+        Can be used to obtain GGR for players in last 24h
       parameters:
         - name: count
           in: query
@@ -2488,16 +2488,7 @@ paths:
           type: integer
           default: 10
           description: Changes amount of results returned
-        - name: fromDate
-          in: query
-          required: false
-          type: string
-          description: If provided, results will be limited from this date
-        - name: toDate
-          in: query
-          required: false
-          type: string
-          description: If provided, results will be limited to this date
+
       responses:
         '200':
           description: Response object
@@ -2514,9 +2505,6 @@ paths:
                     amount:
                       type: number
                       description: Depends on action and type
-                    timestamp:
-                      type: string
-                      description: Depends on action and type
                     name:
                       type: string
                     country:
@@ -2528,8 +2516,6 @@ paths:
                         - F
                     isOnline:
                       type: boolean
-                    gameid:
-                      type: string
                     currencyCode:
                       type: string
                     currencySymbol:
