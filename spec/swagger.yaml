@@ -1291,6 +1291,61 @@ paths:
               properties:
                 info:
                   $ref: "#/definitions/Info"
+                  
+                  
+  /player/games/ratings/aggregated:
+    get:
+      tags:
+        - Player
+        - Protected
+        - Reviews
+      summary: Get aggregated ratings.
+      description: > 
+        Retrieve a list of players game ratings.
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: gamecode
+          in: query
+          required: false
+          type: string
+          description: if provided will return ratings just for that game
+      responses:
+        200:
+          description: OK Ratings found
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                    type: object
+                    properties:
+                      ratings:
+                        type: number
+                        format: integer
+                        description: Number of ratings
+                      game:
+                        type: string
+                        description: game id
+                      score:
+                        type: number
+                        format: float
+                        description: average score
+                      player_score:
+                        type: number
+                        format: integer
+                        description: player's score
+        401:
+          description: Invalid session
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        
+
   /player/games/latests:
     get:
       tags:
