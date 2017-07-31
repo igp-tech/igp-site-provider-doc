@@ -1413,7 +1413,69 @@ paths:
                   $ref: '#/definitions/GameTransaction'
         '401':
           $ref: '#/responses/Error'  
+
   
+  /player/sportsbook/{mode}:
+      get:
+        tags:
+          - Game Library
+          - Protected
+        summary: Get sportsbook game
+        description: >-
+            Possible error codes (resultCode): sportsbook_not_found, sportsbook_not_available, sportsbook_mode_not_valid
+        parameters:
+          - $ref: "#/parameters/Session"
+          - name: mode
+            in: path
+            required: true
+            type: string
+            description: "mode of the sportsbook, sportsbook or sportsbook live ( available modes standard/live, defaults to standard )"
+          - name: play_for_fun
+            in: query
+            required: false
+            type: boolean
+            description: >-
+              "By default disabled, set to "true" to enable play for fun mode. Session
+              header not require if this option is present"
+          - name: lang
+            in: query
+            required: false
+            type: string
+            default: en
+            description: Default 'en'
+          - name: device
+            in: query
+            required: false
+            type: string
+            description: Device that we want to get sportsbook url for, available values mobile|desktop, with default desktop if query value not provided
+        responses:
+          '200':
+            description: Sportsbook
+            schema:
+              type: object
+              properties:
+                info:
+                  $ref: "#/definitions/Info"
+                data:
+                  type: object
+                  properties:
+                    license:
+                      type: string
+                      description: License name
+                    url:
+                      type: string
+                      description: Sportsbook url
+                    system:
+                      type: string
+                      description: System code (pq, ...)
+                    externalInterface:
+                      type: string
+                      description: If available, response will contain a url to external script that can be used for managing sportsbook iframe
+          '400':
+            $ref: '#/responses/Info'
+          '401':
+            $ref: "#/responses/AuthError"
+
   /player/login:
     post:
       tags:
