@@ -1797,6 +1797,55 @@ paths:
                   $ref: '#/definitions/Transaction'
         '401':
           $ref: '#/responses/Info'
+  /player/pendingWithdrawals:
+      get:
+        tags:
+          - Player
+          - Cashier
+          - Protected
+        summary: Get players pending withdrawals
+        parameters:
+          - $ref: "#/parameters/Session"
+        responses:
+          '200':
+            description: Response object
+            schema:
+              type: object
+              properties:
+                info:
+                  $ref: "#/definitions/Info"
+                data:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Transaction'
+          '401':
+            $ref: '#/responses/Info'
+  /player/withdrawals/cancel/:transactionId:
+        get:
+          tags:
+            - Player
+            - Cashier
+            - Protected
+          summary: Get players pending withdrawals
+          parameters:
+            - name: transactionId
+              in: query
+              required: true
+              type: integer
+          responses:
+            '200':
+              description: Response object
+              schema:
+                type: object
+                properties:
+                  info:
+                    $ref: "#/definitions/Info"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/definitions/WithdrawalCanceled'
+            '401':
+              $ref: '#/responses/Info'
   /player/messages:
     get:
       tags:
@@ -3322,6 +3371,21 @@ definitions:
       error_message:
         type: string
         description: error message in case of an error
+
+  WithdrawalCanceled:
+      description: Canceled withdrawal object
+      type: object
+      properties:
+        transactionId:
+          type: string
+        playerId:
+          type: string
+        oldBalance:
+          type: string
+        transactionAmount:
+          type: string
+        playerBalance:
+          type: number
   
   PlayerData:
     description: >
