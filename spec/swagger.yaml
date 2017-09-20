@@ -1820,7 +1820,7 @@ paths:
                     $ref: '#/definitions/Transaction'
           '401':
             $ref: '#/responses/Info'
-  /player/withdrawals/cancel/:transactionId:
+  /player/withdrawals/cancel/{transactionId}:
         get:
           tags:
             - Player
