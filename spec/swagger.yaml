@@ -70,7 +70,7 @@ info:
     The platform provides storage for player an unlimited number of player favorites.
     YOu can add a favorite list, a single favorite entry, update a single entry, or remove entries directly. 
     
-    PlayerFavorites have a "slot" integer which can either be used as a priority setting, or simply a ordering function. Multiple favorites can share a "slot", so you can also use this for grouping favorites.
+    PlayerFavorites have a "slot" integer which can either be used as a priority setting, or simply a ordering function. Multilayerle favorites can share a "slot", so you can also use this for grouping favorites.
     
     #### PlayerRatings
     The platform also provides an interface for storing, deleting and retrieving player game reviews. 
@@ -1797,6 +1797,55 @@ paths:
                   $ref: '#/definitions/Transaction'
         '401':
           $ref: '#/responses/Info'
+  /player/pendingWithdrawals:
+      get:
+        tags:
+          - Player
+          - Cashier
+          - Protected
+        summary: Get players pending withdrawals
+        parameters:
+          - $ref: "#/parameters/Session"
+        responses:
+          '200':
+            description: Response object
+            schema:
+              type: object
+              properties:
+                info:
+                  $ref: "#/definitions/Info"
+                data:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Transaction'
+          '401':
+            $ref: '#/responses/Info'
+  /player/withdrawals/cancel/:transactionId:
+        get:
+          tags:
+            - Player
+            - Cashier
+            - Protected
+          summary: Cancel players pending withdrawal
+          parameters:
+            - name: transactionId
+              in: path
+              required: true
+              type: integer
+          responses:
+            '200':
+              description: Response object
+              schema:
+                type: object
+                properties:
+                  info:
+                    $ref: "#/definitions/Info"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/definitions/WithdrawalCanceled'
+            '401':
+              $ref: '#/responses/Info'
   /player/messages:
     get:
       tags:
@@ -3357,6 +3406,21 @@ definitions:
       error_message:
         type: string
         description: error message in case of an error
+
+  WithdrawalCanceled:
+      description: Canceled withdrawal object
+      type: object
+      properties:
+        transactionId:
+          type: string
+        playerId:
+          type: string
+        oldBalance:
+          type: string
+        transactionAmount:
+          type: string
+        playerBalance:
+          type: number
   
   PlayerData:
     description: >
