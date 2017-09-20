@@ -2959,6 +2959,41 @@ paths:
                 description: Response from igp-internal-apis
 
 
+  /player/withdrawals:
+    get:
+      tags:
+        - Player
+        - Protected
+      summary: Gets the players withdrawals list
+      parameters:
+        - $ref: "#/parameters/Session"
+      responses:
+        '200':
+          description: Withdrawal status
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  sessionValid:
+                    description: Is the session valid
+                    type: boolean
+                  touValid:
+                    description: Has the user accepted the current TOU
+                    type: boolean
+                  performRealityCheck:
+                    description: Does player need to perform reality check
+                    type: boolean
+                  playerTOU:
+                    description: Player accepted version of TOU
+                    type: string
+                  portalTOU:
+                    description: Portal version of TOU
+                    type: integer
+
 definitions:
 
   PlayerAccount:
