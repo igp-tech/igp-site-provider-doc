@@ -70,7 +70,7 @@ info:
     The platform provides storage for player an unlimited number of player favorites.
     YOu can add a favorite list, a single favorite entry, update a single entry, or remove entries directly. 
     
-    PlayerFavorites have a "slot" integer which can either be used as a priority setting, or simply a ordering function. Multiple favorites can share a "slot", so you can also use this for grouping favorites.
+    PlayerFavorites have a "slot" integer which can either be used as a priority setting, or simply a ordering function. Multilayerle favorites can share a "slot", so you can also use this for grouping favorites.
     
     #### PlayerRatings
     The platform also provides an interface for storing, deleting and retrieving player game reviews. 
@@ -1829,7 +1829,7 @@ paths:
           summary: Cancel players pending withdrawal
           parameters:
             - name: transactionId
-              in: query
+              in: path
               required: true
               type: integer
           responses:
