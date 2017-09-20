@@ -1826,7 +1826,7 @@ paths:
             - Player
             - Cashier
             - Protected
-          summary: Get players pending withdrawals
+          summary: Cancel players pending withdrawal
           parameters:
             - name: transactionId
               in: query
