@@ -1876,6 +1876,35 @@ paths:
                         - notification
                         - Error
 
+  /player/bets:
+      get:
+        tags:
+           - Player
+        summary: 'Get list of player bets'
+        parameters:
+          - in: query
+            name: type
+            type: string
+            enum:
+              - casino
+              - sportsbook
+            description: Type of a bet, if not sent api will return all bets
+          - $ref: "#/parameters/Session"
+        responses:
+          '200':
+            description: Response object
+            schema:
+              type: object
+              properties:
+                info:
+                  $ref: "#/definitions/Info"
+                data:
+                  type: array
+                  items:
+                    $ref: '#/definitions/Bet'
+          '401':
+            $ref : "#/responses/Error"
+
   /player/cashier/custom/fields/{transtype}:
     get:
       summary: Custom cashier (form)
@@ -3139,6 +3168,23 @@ definitions:
       ratingNote:
         type: string
         description: Text rating of the game by player.
+
+  Bet:
+    description: Bet object
+    type: object
+    properties:
+      id:
+        type: string
+      game:
+        type: string
+      endDate:
+        type: string
+      betAmount:
+        type: string
+      winAmount:
+        type: string
+      balanceAfter:
+        type: string
 
   Game:
     description: Game object
