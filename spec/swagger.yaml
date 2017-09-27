@@ -1889,6 +1889,14 @@ paths:
               - casino
               - sportsbook
             description: Type of a bet, if not sent api will return all bets
+          - in: query
+            name: fromDate
+            type: string
+            description: Starting date for filtering bets
+          - in: query
+            name: fromDate
+            type: string
+            description: End date for filtering bets
           - $ref: "#/parameters/Session"
         responses:
           '200':
