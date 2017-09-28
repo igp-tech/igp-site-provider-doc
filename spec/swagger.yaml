@@ -1886,6 +1886,7 @@ paths:
             name: type
             type: string
             enum:
+              - all
               - casino
               - sportsbook
             description: Type of a bet, if not sent api will return all bets
@@ -1894,9 +1895,38 @@ paths:
             type: string
             description: Starting date for filtering bets
           - in: query
-            name: fromDate
+            name: toDate
             type: string
             description: End date for filtering bets
+          - in: query
+            name: period
+            type: string
+            enum:
+              - day
+              - week
+              - month
+              - quarter
+              - year
+              - monthToDate
+          - in: query
+            name: pageNum
+            description: Page number
+            type: integer
+          - in: query
+            name: perPage
+            type: string
+            description: Number of bets per page
+          - in: query
+            name: orderBy
+            type: string
+            description: Sort order, default is desc
+            enum:
+              - desc
+              - asc
+          - in: query
+            name: sortBy
+            type: string
+            description: Name of property that we want to sort data, default is dateTime
           - $ref: "#/parameters/Session"
         responses:
           '200':
@@ -3185,13 +3215,13 @@ definitions:
         type: string
       game:
         type: string
-      endDate:
+      dateTime:
         type: string
       betAmount:
         type: string
       winAmount:
         type: string
-      balanceAfter:
+      endBalance:
         type: string
 
   Game:
