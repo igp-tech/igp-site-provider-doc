@@ -113,7 +113,7 @@ info:
       * token_expired - token expired
       * game_not_available
 
-  version: "2.4.11"
+  version: "2.4.12"
 tags:
   - name: Player
     description: |
@@ -1993,7 +1993,7 @@ paths:
                       $ref: "#/definitions/paymentMethod"
         401:
           $ref : "#/responses/Error"
-  
+
   /player/cashier/payment/{processor}/{method}/{type}:
     post:
       summary: Payment submit form
@@ -2216,6 +2216,7 @@ paths:
                 description: Thee payment URL (for see in Iframe)
         '401':
           $ref: '#/responses/Error'
+
   /player/cashier/accounts:
     get:
       tags:
@@ -2233,9 +2234,14 @@ paths:
 
       parameters:
         - $ref: "#/parameters/Session"
-        - name: type
+        - name: processor
           in: query
-          description: Only returns the passed account type if passed.
+          required: false
+          type: string
+          description: payment processor (paymentiq,..) to limit accounts to
+        - name: method
+          in: query
+          description: Only returns account for the passed methods if set.
           required: false
           type: string 
         - name: showExpired
@@ -2253,17 +2259,51 @@ paths:
               info:
                 $ref: "#/definitions/Info"
               data:
-                type: object
-                properties:
-                  methods:
-                    type: array
-                    items:
-                      $ref: "#/definitions/PlayerAccount"
+                type: array
+                items:
+                  $ref: "#/definitions/PlayerAccount"
             
                 
           
         400:
           description: Error
+
+  /player/cashier/accounts/forget/{processor}/{method}/{id}:
+    post:
+      tags:
+        - Player
+        - Cashier
+        - Protected
+        - Unimplemented
+      summary: Forget a players payment account
+      description: Forgetting a payment account means it will not be returned when fetching saved accounts
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: processor
+          in: path
+          required: true
+          type: string
+          description: payment processor (paymentiq,..)
+        - name: method
+          in: path
+          required: true
+          type: string
+          description: payment method
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: The id of the saved account
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          $ref: '#/responses/Error'
   
   /player/limits:
     get:
@@ -3116,29 +3156,22 @@ definitions:
     type: object
     description: the decription
     properties:
-      type:
+      processor:
         type: string
-        description: the type of the account (creditcard, skrill, etc)
-      accountId: 
+        description: payment processor (paymentiq,..)
+      method:
         type: string
-        description: the internal reference to this account
-      maskedAccount:
+        description: payment method (creditcard, skrill, etc)
+      id: 
         type: string
-        description: For credit cards this includes the credit card number to be displayed for this player account, masked for complience purposes.
+        description: the id of this account
       lastUsed:
         type: string
         format: date-time
-      cardType:
-        type: string
-      cardHolder:
-        type: string
-        description: The name of the person, as it appears on the card/account
-      startDate:
-        type: string
-        format: date-time
-      expiryDate:
-        type: string
-        format: date-time     
+      fields:
+        type: array
+        items:
+          $ref: "#/definitions/FieldInstance"
       
   
   PlayerFavorites:
@@ -3566,6 +3599,10 @@ definitions:
       failureUrl:
         type: string
         description: Return url in case of failure
+      bonus_id:
+        type: string
+        required: false
+        description: The bonus_id to activate with this payment
       fields:
         type: array
         items:
@@ -3907,6 +3944,15 @@ definitions:
       form:
         type: object
         description: Information about fields for payment method
+        properties: 
+          fields:
+            type: array
+            description: list off all fields to be posted
+            items:
+              $ref: "#/definitions/FieldDef"
+      savedAccountForm:
+        type: object
+        description: Information about fields for payment method when using saved account
         properties: 
           fields:
             type: array
