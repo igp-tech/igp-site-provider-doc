@@ -1954,7 +1954,7 @@ paths:
         Lists all available deposit and withdraw methods for the active player
         with fields to build up custom deposit/withdraw forms
 
-        Possible error codes (resultCode): payment_processor_invalid_parameters, payment_processor_error
+        Possible error codes (resultCode) > payment_processor_invalid_parameters, payment_processor_error
       parameters:
         - $ref: "#/parameters/Session"
         - name: x-language
@@ -2003,7 +2003,7 @@ paths:
         - Protected
       description: >
         Lists all fields to be posted
-        Possible error codes (resultCode): payment_processor_invalid_parameters, payment_processor_error
+        Possible error codes (resultCode) > payment_processor_invalid_parameters, payment_processor_error
       parameters:
         - $ref: "#/parameters/Session"
         - name: x-language
@@ -3601,7 +3601,6 @@ definitions:
         description: Return url in case of failure
       bonus_id:
         type: string
-        required: false
         description: The bonus_id to activate with this payment
       fields:
         type: array
