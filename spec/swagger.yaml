@@ -113,7 +113,7 @@ info:
       * token_expired - token expired
       * game_not_available
 
-  version: "2.4.12"
+  version: "2.4.13"
 tags:
   - name: Player
     description: |
@@ -1937,34 +1937,9 @@ paths:
                 info:
                   $ref: "#/definitions/Info"
                 data:
-                  type: object
-                  properties:
-                    pagedData:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          id:
-                            type: string
-                          game:
-                            type: string
-                          dateTime:
-                            type: string
-                          betAmount:
-                            type: string
-                          winAmount:
-                            type: string
-                          endBalance:
-                            type: string
-                    paginationData:
-                      type: object
-                      properties:
-                        page:
-                          type: integer
-                        perPage:
-                          type: integer
-                        pageCount:
-                          type: integer
+                  type: array
+                  items:
+                    $ref: '#/definitions/Bet'
           '401':
             $ref : "#/responses/Error"
 
@@ -2287,13 +2262,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/definitions/PlayerAccount"
-            
-                
-          
         400:
           description: Error
 
-  /player/cashier/accounts/forget/{processor}/{method}/{id}:
+  /player/cashier/accounts/forget:
     post:
       tags:
         - Player
@@ -2304,21 +2276,12 @@ paths:
       description: Forgetting a payment account means it will not be returned when fetching saved accounts
       parameters:
         - $ref: "#/parameters/Session"
-        - name: processor
-          in: path
+        - name: body
+          in: body
           required: true
-          type: string
-          description: payment processor (paymentiq,..)
-        - name: method
-          in: path
-          required: true
-          type: string
-          description: payment method
-        - name: id
-          in: path
-          required: true
-          type: string
-          description: The id of the saved account
+          description: list of all fields to be posted
+          schema:
+            $ref: "#/definitions/PlayerAccountKey"
       responses:
         200:
           description : Success
@@ -2329,7 +2292,63 @@ paths:
                 $ref: "#/definitions/Info"
         400:
           $ref: '#/responses/Error'
-  
+
+  /player/cashier/accounts/favorite:
+    post:
+      tags:
+        - Player
+        - Cashier
+        - Protected
+        - Unimplemented
+      summary: favorite a players payment account
+      description: Favouriting a payment account means it will be returned with favorite = true when fetching saved accounts
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: body
+          in: body
+          required: true
+          description: list of all fields to be posted
+          schema:
+            $ref: "#/definitions/PlayerAccountKey"
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          $ref: '#/responses/Error'
+
+  /player/cashier/accounts/unfavorite:
+    post:
+      tags:
+        - Player
+        - Cashier
+        - Protected
+        - Unimplemented
+      summary: unfavorite a players payment account
+      description: Unfavoriting a payment account means it will be returned with favorite = false when fetching saved accounts
+      parameters:
+        - $ref: "#/parameters/Session"
+        - name: body
+          in: body
+          required: true
+          description: list of all fields to be posted
+          schema:
+            $ref: "#/definitions/PlayerAccountKey"
+      responses:
+        200:
+          description : Success
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          $ref: '#/responses/Error'
+
   /player/limits:
     get:
       tags: 
@@ -3190,6 +3209,9 @@ definitions:
       id: 
         type: string
         description: the id of this account
+      favorite: 
+        type: boolean
+        description: if the account is favorited or not
       lastUsed:
         type: string
         format: date-time
@@ -3269,32 +3291,18 @@ definitions:
     description: Bet object
     type: object
     properties:
-      pagedData:
-        type: array
-        items:
-          type: object
-          properties:
-            id:
-              type: string
-            game:
-              type: string
-            dateTime:
-              type: string
-            betAmount:
-              type: string
-            winAmount:
-              type: string
-            endBalance:
-              type: string
-      paginationData:
-        type: object
-        properties:
-          page:
-            type: integer
-          perPage:
-            type: integer
-          pageCount:
-            type: integer
+      id:
+        type: string
+      game:
+        type: string
+      dateTime:
+        type: string
+      betAmount:
+        type: string
+      winAmount:
+        type: string
+      endBalance:
+        type: string
 
   Game:
     description: Game object
@@ -3924,6 +3932,17 @@ definitions:
       pageSize:
         description: The size of each page, 0 if no paging.
         type: integer
+
+  PlayerAccountKey:
+    description : Information identifying a saved financial account
+    type: object
+    properties:
+      processor:
+        type: string
+      method:
+        type: string
+      id:
+        type: string
 
   paymentMethod:
     description : Information regarding an available payment method.
