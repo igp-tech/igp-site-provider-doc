@@ -1937,9 +1937,36 @@ paths:
                 info:
                   $ref: "#/definitions/Info"
                 data:
-                  type: array
-                  items:
-                    $ref: '#/definitions/Bet'
+                  type: object
+                  properties:
+                    pagedData:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          game:
+                            type: string
+                          gameName:
+                            type: string
+                          dateTime:
+                            type: string
+                          betAmount:
+                            type: string
+                          winAmount:
+                            type: string
+                          endBalance:
+                            type: string
+                    paginationData:
+                      type: object
+                      properties:
+                        page:
+                          type: integer
+                        perPage:
+                          type: integer
+                        pageCount:
+                          type: integer
           '401':
             $ref : "#/responses/Error"
 
