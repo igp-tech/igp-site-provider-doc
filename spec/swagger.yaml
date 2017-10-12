@@ -1950,6 +1950,10 @@ paths:
                             type: string
                           gameName:
                             type: string
+                          gameProviderCode:
+                            type: string
+                          gameProviderName:
+                            type: string
                           dateTime:
                             type: string
                           betAmount:
