@@ -1909,7 +1909,7 @@ paths:
               - year
               - monthToDate
           - in: query
-            name: pageNum
+            name: page
             description: Page number
             type: integer
           - in: query
