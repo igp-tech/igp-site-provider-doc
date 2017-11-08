@@ -2608,10 +2608,74 @@ paths:
           schema:
             type: file
             format: application/js
+
+  /validate/{validatorKey}:
+    post:
+      tags:
+        - Unimplemented
+      summary: > 
+        Validate a value against the passed validator
+      parameters:
+        - $ref: "#/parameters/AnonSession"
+        - name: validatorKey
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              value:
+                type: string
+                description: User input
+                required: true
+              params:
+                type: object
+                description: Validator parameters
+                required: false
+      responses:
+        200:
+          description: Valid value
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          description: Validation failed, system error
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        404:
+          description: Validator not found
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                $ref: "#/definitions/Validator"
+        422:
+          description: The value is NOT valued with the passed validator
+          headers:
+              x-is-valid:
+                description: Is the value valid (false)
+                type: boolean
+          schema: 
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                $ref: "#/definitions/Validator"
+        
   /validate/{validatorKey}/{value}:
     get:
       tags:
-        - Validation
+        - Deprecated
       summary: > 
         Validate a value against the passed validator
       parameters:
@@ -2676,6 +2740,7 @@ paths:
               x-is-valid:
                 description: Is the value valid (false)
                 type: boolean
+     
   /validate/player/email/{email}:
     get:
       tags:
