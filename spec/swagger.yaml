@@ -113,7 +113,7 @@ info:
       * token_expired - token expired
       * game_not_available
 
-  version: "2.4.13"
+  version: "2.4.14"
 tags:
   - name: Player
     description: |
@@ -2048,6 +2048,11 @@ paths:
           description: list off all fields to be posted
           schema:
             $ref: "#/definitions/PaymentSubmit"
+        - name: WithBonus
+          in: query
+          required: true
+          type: boolean
+          description: if bonus should activate on submit
         - name: processor
           in: path
           required: true
@@ -3742,6 +3747,9 @@ definitions:
       failureUrl:
         type: string
         description: Return url in case of failure
+      bonus_code:
+        type: string
+        description: The bonus_code to activate with this payment
       bonus_id:
         type: string
         description: The bonus_id to activate with this payment
