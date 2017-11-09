@@ -2634,11 +2634,11 @@ paths:
               value:
                 type: string
                 description: User input
-                required: true
+                #required: true
               params:
                 type: object
                 description: Validator parameters
-                required: false
+                #required: false
       responses:
         200:
           description: Valid value
