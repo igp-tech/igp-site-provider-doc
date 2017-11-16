@@ -1975,6 +1975,79 @@ paths:
           '401':
             $ref : "#/responses/Error"
 
+  /player/sportsBets:
+        get:
+          tags:
+             - Player
+          summary: 'Get list of player sportsbook bets'
+          parameters:
+            - in: query
+              name: page
+              description: Page number
+              type: integer
+            - in: query
+              name: perPage
+              type: string
+              description: Number of bets per page
+            - $ref: "#/parameters/Session"
+          responses:
+            '200':
+              description: Response object
+              schema:
+                type: object
+                properties:
+                  info:
+                    $ref: "#/definitions/Info"
+                  data:
+                    type: object
+                    properties:
+                      pagedData:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            dateTime:
+                              type: string
+                            endDateTime:
+                              type: string
+                            bettingType:
+                              type: string
+                            status:
+                              type: string
+                            eventCount:
+                              type: string
+                            type:
+                              type: string
+                            betAmount:
+                              type: string
+                            winAmount:
+                              type: string
+                            oddsCount:
+                              type: string
+                            potentialWinAmount:
+                              type: string
+                            currency:
+                              type: string
+                            BettingTypeId:
+                              type: string
+                            TicketStatusId:
+                              type: string
+                            totalOdds:
+                              type: string
+                      paginationData:
+                        type: object
+                        properties:
+                          page:
+                            type: integer
+                          perPage:
+                            type: integer
+                          pageCount:
+                            type: integer
+            '401':
+              $ref : "#/responses/Error"
+
   /player/cashier/custom/fields/{transtype}:
     get:
       summary: Custom cashier (form)
