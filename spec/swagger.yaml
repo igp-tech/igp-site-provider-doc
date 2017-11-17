@@ -3042,6 +3042,9 @@ paths:
                   net:
                     description: Wins - bets
                     type: string
+                  net_real:
+                    description: Wins - bets - real
+                    type: string
                   timePlayed:
                     description: Player session time
                     type: string
