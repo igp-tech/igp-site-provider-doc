@@ -113,7 +113,7 @@ info:
       * token_expired - token expired
       * game_not_available
 
-  version: "2.4.15"
+  version: "2.4.16"
 tags:
   - name: Player
     description: |
@@ -1509,6 +1509,68 @@ paths:
                 $ref: "#/definitions/Info"
               data:
                 $ref: '#/definitions/Player'
+        '401':
+          $ref: '#/responses/Error'
+
+  /player/locale/{locale}:
+    put:
+      tags:
+        - Player
+        - Auth
+      summary: Update locale for a player
+      description: >
+        Update a players locale
+        
+        Possible error codes (resultCode): missing_locale, locale_update_failed
+            
+      parameters:
+        - $ref: "#/parameters/AnonSession"
+        - name: locale
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Locale update successful.
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  locale:
+                    type: string
+                    description: The players locale (ex en_US, en_GB)
+        '401':
+          $ref: '#/responses/Error'
+
+  /player/locale:
+    get:
+      tags:
+        - Player
+        - Auth
+      summary: Get locale for a player
+      description: >
+        Get a players locale
+            
+      parameters:
+        - $ref: "#/parameters/AnonSession"
+      responses:
+        '200':
+          description: Locale
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  locale:
+                    type: string
+                    description: The players locale (ex en_US, en_GB)
         '401':
           $ref: '#/responses/Error'
 
@@ -3539,12 +3601,9 @@ definitions:
         description: two letter country code
       currencysymbol:
         type: string
-      languagecode:
+      locale:
         type: string
-        description: language locale code
-        example: 
-          - en_GB
-          - it_IT
+        description: Locale code (ex en_GB, en_US)
       sessionid:
         type: string
   
@@ -3771,6 +3830,9 @@ definitions:
       newsletter:
         type: boolean
         description: Should player receive newsletter
+      locale:
+        type: string
+        description: Locale code (ex en_GB, en_US)
       schemaCode:
         $ref: "#/definitions/SchemaCode"
       fields:
