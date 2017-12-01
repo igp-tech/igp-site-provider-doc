@@ -113,7 +113,7 @@ info:
       * token_expired - token expired
       * game_not_available
 
-  version: "2.4.16"
+  version: "2.4.17"
 tags:
   - name: Player
     description: |
@@ -675,7 +675,33 @@ paths:
                     description: Portal version of TOU
                     type: integer
                     
-                    
+  /player/cashback:
+     get:
+       tags:
+         - Player
+       summary: Gets the array of players cashback programs
+       parameters:
+         - $ref: "#/parameters/Session"
+       responses:
+         200:
+           description: Player cashback
+           schema:
+             type: object
+             properties:
+               info:
+                 $ref: "#/definitions/Info"
+               data:
+                 type: array
+                 items:
+                   $ref: '#/definitions/Cashback'
+         400:
+           description: Unble to fetch cashback
+           schema:
+             type: object
+             properties:
+               info:
+                 $ref: "#/definitions/Info"
+
   /player/activate/:token:
     get:
       tags:
@@ -4223,7 +4249,10 @@ definitions:
             type: array
             description: list off all fields to be posted
             items:
-              $ref: "#/definitions/FieldDef"  
+              $ref: "#/definitions/FieldDef"
+      requiresSavedAccount:
+        type: boolean
+        description: If this method requires matching saved account to be used
   
   GameTransaction:
     description: Transaction
@@ -4267,7 +4296,72 @@ definitions:
       key:
         type: string
         description: Optional
-  
+
+  Cashback:
+      description: Cashback program
+      type: object
+      properties:
+        slug:
+          type: string
+          description: Cashback slug
+        minRedemption:
+          type: number
+          description: min Redemption
+        maxRedemption:
+          type: number
+          description: max Redemption
+        requirements:
+          type: array
+          description: Program requirements
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              properties:
+                type: object
+                description: Optional
+        previousPeriod:
+          type: object
+          properties:
+            periodStart:
+              description: date
+              type: string
+            periodEnd:
+              description: date
+              type: string
+            amountEarned:
+              type: number
+            requirements:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  fulfilled:
+                    type: boolean
+        currentPeriod:
+          type: object
+          properties:
+            periodStart:
+              description: date
+              type: string
+            periodEnd:
+              description: date
+              type: string
+            amountEarned:
+              type: number
+            requirements:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  fulfilled:
+                    type: boolean
+
   Bonus:
     description: Bonus information
     type: object
