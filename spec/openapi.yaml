@@ -168,6 +168,37 @@ produces:
 - application/json
 basePath: '/api'
 paths:
+  '/player/queryTags':
+    post:
+      tags:
+        - Player
+      summary: Query player tag status
+      description: get the information if player has provided tags set
+      parameters:
+        - $ref: "#/parameters/Session"
+        - $ref: "#/parameters/Origin"
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  tag:
+                      type: boolean
+        400:
+          $ref: '#/responses/Error'
   /quests/current:
     get:
       summary: get current active quest data
