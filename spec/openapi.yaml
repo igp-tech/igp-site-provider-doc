@@ -121,6 +121,8 @@ tags:
     as retriving the datamodeles/ schemas for the sites player data.
 - name: Game Library
   description: Game Library and Game Related Enpoints
+- name: Cashback
+  description: Endpoints that are related to cashback
 - name: Auth
   description: Authorization and password related endpoints
 - name : Cashier
@@ -168,6 +170,198 @@ produces:
 - application/json
 basePath: '/api'
 paths:
+  '/cashback':
+    get:
+      tags:
+        - Cashback
+      summary: Get cashback info from sql for portal in provided period
+      description: Get cashback info from sql for portal
+      parameters:
+        - $ref: "#/parameters/Session"
+        - $ref: "#/parameters/Origin"
+        - name: dateFrom
+          in: query
+          required: true
+          type: string
+        - name: dateTo
+          in: query
+          required: true
+          type: string
+        - name: sortBy
+          in: query
+          required: false
+          type: string
+          enum:
+            - loyalty_points
+            - loyalty_slug
+            - redeemable_points
+            - cashback_amount
+            - awarded_cashback
+            - date
+        - name: orderBy
+          in: query
+          required: false
+          type: string
+          enum:
+            - asc
+            - desc
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                    type: object
+                    properties:
+                        loyalty_slug:
+                            type: string
+                        loyalty_points:
+                            type: string
+                        cashback_amount:
+                            type: number
+        400:
+          $ref: '#/responses/Error'
+  '/cashback/byPlayer':
+    get:
+      tags:
+        - Cashback
+      summary: Get cashback info from sql for portal in provided period
+      description: Get cashback info from sql for portal
+      parameters:
+        - $ref: "#/parameters/Session"
+        - $ref: "#/parameters/Origin"
+        - name: dateFrom
+          in: query
+          required: true
+          type: string
+        - name: dateTo
+          in: query
+          required: true
+          type: string
+        - name: sortBy
+          in: query
+          required: false
+          type: string
+          enum:
+            - loyalty_points
+            - loyalty_slug
+            - redeemable_points
+            - cashback_amount
+            - awarded_cashback
+            - date
+        - name: orderBy
+          in: query
+          required: false
+          type: string
+          enum:
+            - asc
+            - desc
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                    type: object
+                    properties:
+                        loyalty_slug:
+                            type: string
+                        loyalty_points:
+                            type: string
+                        cashback_amount:
+                            type: number
+                        player_id:
+                            type: string
+        400:
+          $ref: '#/responses/Error'
+  '/player/cashback/simple':
+    get:
+      tags:
+        - Player
+        - Cashback
+      summary: Get cashback info from sql
+      description: Get cashback info from sql
+      parameters:
+        - $ref: "#/parameters/Session"
+        - $ref: "#/parameters/Origin"
+        - name: dateFrom
+          in: query
+          required: true
+          type: string
+        - name: dateTo
+          in: query
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  loyaltySlug:
+                    type: string
+                  loyaltyPoints:
+                    type: string
+                  cashbackAmount:
+                    type: number
+        400:
+          $ref: '#/responses/Error'
+  '/cashback/{loyaltySlug}':
+    get:
+      tags:
+        - Cashback
+      summary: Get cashback info for specific loyalty program
+      description: Get cashback info for specific loyalty program
+      parameters:
+        - $ref: "#/parameters/Session"
+        - $ref: "#/parameters/Origin"
+        - name: loyaltySlug
+          in: path
+          required: true
+          type: string
+          description: Loyaty program slug
+        - name: dateFrom
+          in: query
+          required: true
+          type: string
+        - name: dateTo
+          in: query
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                    loyalty_slug:
+                        type: string
+                    loyalty_points:
+                        type: string
+                    cashback_amount:
+                        type: number
+        400:
+          $ref: '#/responses/Error'
   '/player/queryTags':
     post:
       tags:
