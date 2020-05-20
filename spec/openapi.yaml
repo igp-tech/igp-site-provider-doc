@@ -211,13 +211,11 @@ paths:
                 $ref: "#/definitions/Info"
               data:
                 type: object
-                items:
-                    type: object
-                    properties:
-                        loyalty_slug:
-                            type: string
-                        cashback_amount:
-                            type: number
+                properties:
+                  loyalty_points:
+                    type: number
+                  cashback_amount:
+                    type: number
         400:
           $ref: '#/responses/Error'
   '/cashback/byPlayer':
@@ -314,11 +312,11 @@ paths:
               data:
                 type: object
                 properties:
-                  loyaltySlug:
+                  loyalty_slug:
                     type: string
-                  loyaltyPoints:
+                  loyalty_points:
                     type: string
-                  cashbackAmount:
+                  cashback_amount:
                     type: number
         400:
           $ref: '#/responses/Error'
