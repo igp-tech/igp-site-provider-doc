@@ -194,13 +194,15 @@ paths:
           enum:
             - loyalty_points
             - cashback_amount
-        - name: orderBy
+        - name: sortOrder
           in: query
           required: false
           type: string
+          default: desc
           enum:
             - asc
             - desc
+        - $ref: "#/parameters/Currency"
       responses:
         200:
           description: Success
@@ -251,13 +253,15 @@ paths:
           enum:
             - loyalty_points
             - cashback_amount
-        - name: orderBy
+        - name: sortOrder
           in: query
           required: false
           type: string
+          default: desc
           enum:
             - asc
             - desc
+        - $ref: "#/parameters/Currency"
       responses:
         200:
           description: Success
@@ -349,13 +353,15 @@ paths:
           enum:
             - loyalty_points
             - cashback_amount
-        - name: orderBy
+        - name: sortOrder
           in: query
           required: false
           type: string
+          default: desc
           enum:
             - asc
             - desc
+        - $ref: "#/parameters/Currency"
       responses:
         200:
           description: Success
@@ -5816,3 +5822,10 @@ parameters:
       Origin is usually url of portal (eg. slotsio.xyz)
     required: true
     type: string
+  Currency:
+    name: currency
+    in: query
+    required: false
+    type: string
+    default: EUR
+    description: Currency in which results will be returned.
