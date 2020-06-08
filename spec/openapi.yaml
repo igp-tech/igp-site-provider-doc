@@ -394,9 +394,12 @@ paths:
           in: body
           required: true
           schema:
-            type: array
-            items:
-              type: string
+            type: object
+            properties:
+              tags:
+                type: array
+                items:
+                  type: string
       responses:
         200:
           description: Success
