@@ -163,6 +163,8 @@ tags:
   description: Endpoints related to connectivity and healthchecking
 - name: Under Review/Untested
   description: Endpoints that are legacy/or could not be tested
+- name: Emails
+  description: Endpoints related to emails
 host: demo-api.igp.cloud
 schemes:
 - https
@@ -170,6 +172,56 @@ produces:
 - application/json
 basePath: '/api'
 paths:
+  '/email/sendemail/{mailbox}':
+    post:
+      tags:
+        - Emails
+      summary: Send email
+      description: >
+        Sends email to desired mailbox
+      parameters:
+        - $ref: "#/parameters/Origin"
+        - name: mailbox
+          in: path
+          required: true
+          type: string
+          enum:
+            - affiliate
+            - support
+          description: mailbox name
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              subject:
+                type: string
+                description: email subject, required property
+              content:
+                type: string
+                description: email content, required property
+              fromEmail:
+                type: string
+                description: User email, required property
+              senderFullName:
+                type: string
+                description: User full name, optional property
+      responses:
+        200:
+          description: Email sent
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        400:
+          description: Email not sent.
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
   '/cashback':
     get:
       tags:
