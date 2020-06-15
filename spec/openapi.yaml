@@ -246,13 +246,15 @@ paths:
           enum:
             - loyalty_points
             - cashback_amount
-        - name: orderBy
+        - name: sortOrder
           in: query
           required: false
           type: string
+          default: desc
           enum:
             - asc
             - desc
+        - $ref: "#/parameters/Currency"
       responses:
         200:
           description: Success
@@ -263,13 +265,11 @@ paths:
                 $ref: "#/definitions/Info"
               data:
                 type: object
-                items:
-                    type: object
-                    properties:
-                        loyalty_slug:
-                            type: string
-                        cashback_amount:
-                            type: number
+                properties:
+                  loyalty_points:
+                    type: number
+                  cashback_amount:
+                    type: number
         400:
           $ref: '#/responses/Error'
   '/cashback/byPlayer':
@@ -305,13 +305,15 @@ paths:
           enum:
             - loyalty_points
             - cashback_amount
-        - name: orderBy
+        - name: sortOrder
           in: query
           required: false
           type: string
+          default: desc
           enum:
             - asc
             - desc
+        - $ref: "#/parameters/Currency"
       responses:
         200:
           description: Success
@@ -366,11 +368,11 @@ paths:
               data:
                 type: object
                 properties:
-                  loyaltySlug:
+                  loyalty_slug:
                     type: string
-                  loyaltyPoints:
+                  loyalty_points:
                     type: string
-                  cashbackAmount:
+                  cashback_amount:
                     type: number
         400:
           $ref: '#/responses/Error'
@@ -403,13 +405,15 @@ paths:
           enum:
             - loyalty_points
             - cashback_amount
-        - name: orderBy
+        - name: sortOrder
           in: query
           required: false
           type: string
+          default: desc
           enum:
             - asc
             - desc
+        - $ref: "#/parameters/Currency"
       responses:
         200:
           description: Success
@@ -442,9 +446,12 @@ paths:
           in: body
           required: true
           schema:
-            type: array
-            items:
-              type: string
+            type: object
+            properties:
+              tags:
+                type: array
+                items:
+                  type: string
       responses:
         200:
           description: Success
@@ -5870,3 +5877,10 @@ parameters:
       Origin is usually url of portal (eg. slotsio.xyz)
     required: true
     type: string
+  Currency:
+    name: currency
+    in: query
+    required: false
+    type: string
+    default: EUR
+    description: Currency in which results will be returned.
