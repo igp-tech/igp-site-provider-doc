@@ -3543,7 +3543,7 @@ paths:
             password:
               type: string
               description: Player password
-            amount:
+            interval:
               type: number
               description: Number of days
       responses:
