@@ -2342,6 +2342,97 @@ paths:
                 $ref: "#/definitions/Info"
         '400':
           $ref: "#/responses/InvalidPlayerdata"
+  
+  /sms-verification/code:
+    post:
+      tags:
+      - Player
+      - Auth
+      - 2FA
+      summary: Request 2FA sms verification code
+      description: >
+        Possible error codes (resultCode): error_obtaining_code
+      parameters:
+      - $ref: "#/parameters/Session"
+      - $ref: "#/parameters/Origin"
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            phoneNumber:
+              type: string
+              description: Users phone number
+      responses:
+        '201':
+          description: Code acquired
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    verificationSid:
+                      type: string
+        '400':
+          description: Error acquiring
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+                
+  /sms-verification/check:
+    post:
+      tags:
+      - Player
+      - Auth
+      - 2FA
+      summary: Check if 2FA sms verification code is ok
+      description: >
+        Possible error codes (resultCode): code_check_failed
+      parameters:
+      - $ref: "#/parameters/Session"
+      - $ref: "#/parameters/Origin"
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            enteredCode:
+              type: string
+              description: Code to check
+            verificationSid :
+              type: string
+              description: Id of verification
+      responses:
+        '201':
+          description: Check successful
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    verificationSid:
+                      type: string
+        '400':
+          description: Code check unsuccessful
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
 
   /player/balance:
     get:
