@@ -1,0 +1,2082 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Site provider api",
+    "description": "![Logo](https://scdn.ntgm.rocks/image/OTH/200/auto/igp-logo-dark.png)\n\n\nVersion 2.2.X Of the Site Provider completes the re-engineering of the registration endpoints, introducing\ndynamic schemas and PlayerRegistration objects.\n\n### PlayerSchemas\n\nRobust, fully dynamic datamodel and FormView templates for registration data, including extendable validator\nlogic.\n\nFor each portal, there can be multiple playerSchemas, although it is envisioned that all sites will have three:\n\n* registrationFull\n* registrationShort\n* playerProfile\n\nThe schemas return datamodel and formview data for dynamic rendering of all forms, and include additional data\nsuch as:\n\n* HTML5 Hint: the suggested HTML5 control to use with the each field.\n* FieldType: A logical field type, based on the DK formbuilder for handeling of specific types of fields, such as:\n  * TAC\n  * Country picker\n  * Color chooser\n  * Link\n\nAs well as other standard field types like date, datetime, etc.  \n\nField definitions provide information such as required status, JSON dataType, grouping information, and field order.\n\nFor select/multiselect/radio fields values valueLists, and default values are provided. These values are provided\nonly as \"slugs\" for the value portion of the controls, leaving localization up to the consumer. *This should be evaluated in next versions to see if this is the best way to handle localization*\n\n#### Validators\n\nField validation logic is handled by returning an array of validators for each field. This will allow consumers, if they wish, to implement the same JavaScript validators that are used on the back end. If not desired, validators \nreturn slugs of their names for localization. A validator description is also provided for developer use.\n\nTODO: Validator endpoint specification.\n\n#### AutoLogin\n\nThe autologin option and functionality is added, if requested, and enabled on the backend, a valid session ID for the new user will be generated and returned in headers when a new player is registered.\n\n#### PlayerFavorites\nThe platform provides storage for player an unlimited number of player favorites.\nYOu can add a favorite list, a single favorite entry, update a single entry, or remove entries directly. \n\nPlayerFavorites have a \"slot\" integer which can either be used as a priority setting, or simply a ordering function. Multiple favorites can share a \"slot\", so you can also use this for grouping favorites.\n\n\nAdd \"lang\" query parameter to any call for changing language of messages (format en_GB, it_IT, ...)\n",
+    "version": "2.3.0"
+  },
+  "tags": [
+    {
+      "name": "Player",
+      "description": "Player related endpoints. Endpoints for registering new players, getting player information, as well\nas retriving the datamodeles/ schemas for the sites player data.\n"
+    },
+    {
+      "name": "Game Library",
+      "description": "Game Library and Game Related Enpoints"
+    },
+    {
+      "name": "Auth",
+      "description": "Authorization and password related endpoints"
+    },
+    {
+      "name": "Cashier",
+      "description": "Cashier Related endpoints"
+    },
+    {
+      "name": "Registration",
+      "description": "Registration related endpoints."
+    },
+    {
+      "name": "Protected",
+      "description": "Endpoints which require a valid session."
+    }
+  ],
+  "host": "dev.pantaloo.com",
+  "schemes": [
+    "http"
+  ],
+  "basePath": "/api/v2/site",
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/games": {
+      "get": {
+        "tags": [
+          "Game Library"
+        ],
+        "summary": "Get games list",
+        "responses": {
+          "200": {
+            "description": "Response object",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Game"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/player/schemas": {
+      "get": {
+        "tags": [
+          "Player",
+          "Registration"
+        ],
+        "description": "Returns full definition of the player schemas available for the portal. \n\n Usually portals have 3 schemas:\n\n * registrationFull\n * registrationQuick \n * PlayerProfile.\n",
+        "summary": "Retrieve all player schemas for site.",
+        "responses": {
+          "200": {
+            "description": "Response object",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "type": "array",
+                  "description": "An array of player schemas",
+                  "items": {
+                    "$ref": "#/definitions/PlayerSchema"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/player/schema": {
+      "get": {
+        "tags": [
+          "Player",
+          "Registration"
+        ],
+        "summary": "Retrieve a single PlayerProfile by code",
+        "parameters": [
+          {
+            "name": "schemaCode",
+            "in": "query",
+            "description": "The code of the schema to be retrieved",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response object",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "$ref": "#/definitions/PlayerSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/player/full": {
+      "get": {
+        "tags": [
+          "Player"
+        ],
+        "summary": "Retrieve a player's full profile.",
+        "description": "Retrieves all player data, including all custom fields, in the form of fieldInstances.\n",
+        "parameters": [
+          {
+            "name": "Blue-Session",
+            "in": "header",
+            "description": "Session key",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Valid input",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "$ref": "#/definitions/PlayerData"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/responses/Info"
+          }
+        }
+      }
+    },
+    "/player": {
+      "get": {
+        "tags": [
+          "Player",
+          "Protected"
+        ],
+        "summary": "Retrieve a player's profile (flat)",
+        "description": "Retrieves core player information based on the players session.\n",
+        "parameters": [
+          {
+            "name": "Blue-Session",
+            "in": "header",
+            "description": "Session key",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Valid input",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "$ref": "#/definitions/Player"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/responses/Info"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Player",
+          "Protected"
+        ],
+        "summary": "Update a player profile",
+        "description": "Updates (patches) a the profile data for the current session. Only the data which needs to be updated should be submitted.\nData is submitted using `fieldInstances` in  a similar manner to `[POST] /player` with arrays of `fieldInstances[Str|Num|Arr|Obj]` in the appropriate property. \n",
+        "parameters": [
+          {
+            "name": "Blue-Session",
+            "in": "header",
+            "description": "Session key",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlayerData"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Valid input",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "$ref": "#/definitions/PlayerData"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/responses/Info"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Player"
+        ],
+        "summary": "Create (register) a new player by posting a player schema.",
+        "description": "The fully featured player register endpoint. This endpoint accepts a complex object consisting of arrays of `fieldInstance`s, one for each JSON data type.\n  \n  * Value is string = `fieldInstancesStr`\n  * Value is number = `fieldInstancesNum`\n  * Value is array = `fieldInstancesArr`\n  * Value is object = `fieldInstancesObj`\n  \n  \n  **The schema code for the desired PlayerSchema must be provided.**\n  \n  \n  The sent data will then be validated against the selected schema as well as all core data rules. Upon validation error the response object will contain a list of invalid fields as well as which validation rule or rules were triggered, in order of triggering.\n",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlayerRegistration"
+            }
+          },
+          {
+            "name": "autoLogin",
+            "in": "header",
+            "type": "boolean",
+            "description": "Requesting autologin of the player if registration succeeds. If the option is enabled in the site setup, and requested, a valid session id will be returned.\n"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Valid input, player created/registered.",
+            "headers": {
+              "x-sessionid": {
+                "type": "string",
+                "description": "If autologin option was requested, and autologin is enabled for the site, the player's valid `sessionid`."
+              }
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/InvalidPlayerdata"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Player"
+        ],
+        "summary": "Create (register) a simple player",
+        "description": "A simplyfied endpoint for registering a player using limited, predifined  fields.\n\n**This method provides a simple registration which give you a shortcut to the most basic required fields to create a player. Under most jurisdictions, the player will not be able to deposit, withdraw or play until the required player data has been submitted via the `POST` method.**\n\n**If you wish to use extended/customized fields, use the `POST` method.**\n",
+        "parameters": [
+          {
+            "name": "autoLogin",
+            "in": "header",
+            "description": "Requesting autologin of the player if registration succeeds. If the option is enabled in the site setup, and requested, a valid session id will be returned.\n",
+            "required": false,
+            "default": false,
+            "type": "boolean"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CorePlayerInput"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Valid input - Player Created",
+            "headers": {
+              "x-sessionid": {
+                "type": "string",
+                "description": "If autologin option was requested, and autologin is enabled for the site, the player's valid `sessionid`."
+              }
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "type": "number"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/responses/InvalidPlayerdata"
+          }
+        }
+      }
+    },
+    "/player/checkusername/{username}": {
+      "head": {
+        "tags": [
+          "Player"
+        ],
+        "summary": "Check the validity of a username",
+        "description": "Checks the submitted username to see if is valid for a new user for the site. Checks duplicates and username standards.\n",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, submitted username is valid, and can be used for a new player.",
+            "headers": {
+              "x-username-valid": {
+                "type": "boolean"
+              }
+            }
+          },
+          "400": {
+            "description": "The username was not submitted correctly, can not validate the username."
+          },
+          "409": {
+            "description": "Invalid, the specificed username can **not** be used for new player registration.",
+            "headers": {
+              "x-username-valid": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/player/checkemail/{email}": {
+      "head": {
+        "tags": [
+          "Player"
+        ],
+        "summary": "Check the validity of a email",
+        "description": "Checks the submitted username to see if is valid for a new user for the site. Checks duplicates and username standards.\n",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, submitted email is valid, and can be used for a new player",
+            "headers": {
+              "x-valid": {
+                "type": "boolean"
+              }
+            }
+          },
+          "400": {
+            "description": "The email was not submitted correctly, can not validate the username."
+          },
+          "409": {
+            "description": "Invalid, the specificed email can **not** be used for new player registration.",
+            "headers": {
+              "x-valid": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/player/favorites": {
+      "head": {
+        "tags": [
+          "Player",
+          "Protected"
+        ],
+        "summary": "Get the count of player favorites",
+        "description": "Returns the count of player favorites in header.\n",
+        "parameters": [
+          {
+            "$ref": "#/parameters/Session"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK Favorites, found",
+            "headers": {
+              "x-favorite-count": {
+                "type": "integer",
+                "description": "Count of favorites for player"
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid session",
+            "headers": {
+              "x-error-code": {
+                "type": "string",
+                "description": "error code"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Player",
+          "Protected"
+        ],
+        "summary": "Get a players favorite games.",
+        "description": "Retrieve the list of the players favorite games, as stored by the player. The platform provides an unlimited number of \"slots\" which are simply integers for storing the favorites. The system does not check for you if you assing more than one favorite to the same slot, so you may want to check that yourself.\n",
+        "parameters": [
+          {
+            "$ref": "#/parameters/Session"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK Favorites, found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "$ref": "#/definitions/PlayerFavorites"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid session",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Player has no favorites",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Player",
+          "Protected"
+        ],
+        "summary": "Post a list of favorite games.",
+        "description": "Post an entire list of player favorites, will overwrite existing list.\n",
+        "parameters": [
+          {
+            "$ref": "#/parameters/Session"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlayerFavorites"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok, favorite list updated.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Ok, favorite list created.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid favorites data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid session",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Player",
+          "Protected"
+        ],
+        "summary": "Add or modify a single favorite listing",
+        "description": "Add or modify a list of player favorites, keyed on game id.\n",
+        "parameters": [
+          {
+            "$ref": "#/parameters/Session"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlayerFavorite"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Existing Favorite updated.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New Favorite created.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid favorites data.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid session",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Player",
+          "Protected"
+        ],
+        "summary": "Remove a favorite listing",
+        "description": "Remove a favorite listing of player favorites, keyed on game id.\n",
+        "parameters": [
+          {
+            "$ref": "#/parameters/Session"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PlayerFavorite"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Favorite deleted.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid session",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Favorite not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/player/login": {
+      "post": {
+        "tags": [
+          "Player",
+          "Auth"
+        ],
+        "summary": "Player login",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "$ref": "#/definitions/Player"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/responses/Info"
+          }
+        }
+      }
+    },
+    "/player/logout": {
+      "get": {
+        "tags": [
+          "Player",
+          "Auth",
+          "Protected"
+        ],
+        "summary": "Player logout",
+        "parameters": [
+          {
+            "name": "Blue-Session",
+            "in": "header",
+            "description": "Session key",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                }
+              }
+            },
+            "description": "Logout successful"
+          },
+          "401": {
+            "$ref": "#/responses/Info"
+          }
+        }
+      }
+    },
+    "/player/forgottenpass": {
+      "post": {
+        "tags": [
+          "Player",
+          "Auth"
+        ],
+        "summary": "Request a password reset",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reset token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/responses/Info"
+          }
+        }
+      }
+    },
+    "/player/resetpass/{token}": {
+      "post": {
+        "tags": [
+          "Player",
+          "Auth",
+          "Protected"
+        ],
+        "summary": "Reset a players password",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "new_password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reset token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "reset": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/responses/Info"
+          }
+        }
+      }
+    },
+    "/player/balance": {
+      "get": {
+        "tags": [
+          "Player",
+          "Cashier",
+          "Protected"
+        ],
+        "summary": "Player balance",
+        "parameters": [
+          {
+            "name": "Blue-Session",
+            "in": "header",
+            "description": "Session key",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Player balance",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "balance": {
+                      "type": "string"
+                    },
+                    "bonus": {
+                      "type": "string"
+                    },
+                    "currencycode": {
+                      "type": "string"
+                    },
+                    "currencysymbol": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/responses/Info"
+          }
+        }
+      }
+    },
+    "/player/transactions": {
+      "get": {
+        "tags": [
+          "Player",
+          "Cashier",
+          "Protected"
+        ],
+        "summary": "Get players transactions",
+        "parameters": [
+          {
+            "name": "Blue-Session",
+            "in": "header",
+            "description": "Session key",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response object",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Transaction"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/responses/Info"
+          }
+        }
+      }
+    },
+    "/player/messages": {
+      "get": {
+        "tags": [
+          "Player",
+          "Cashier",
+          "Protected"
+        ],
+        "summary": "Get messages for player ( deposit/withdraw confirations, Errors)",
+        "parameters": [
+          {
+            "name": "Blue-Session",
+            "in": "header",
+            "description": "Session key",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response object",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "notification",
+                          "Error"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/player/cashier/{operation}": {
+      "get": {
+        "tags": [
+          "Player",
+          "Cashier",
+          "Protected"
+        ],
+        "summary": "Get cashier url",
+        "description": "Test credit cards\n\nCredit cards N3DS: 4907639999990022, 5546989999990033, 4775889400000171, 4917484589897107,4012000033330026, 5432673003275469\n\nCredit cards 3DS:\n- 4000000000000002; exp. date = 01/2018\n- 5200000000000106; exp. date = 04/2018\n\nAstropayCard:\n- 1606482490412232; exp. Date = 08/2016, CVV code: 6771\n",
+        "parameters": [
+          {
+            "name": "Blue-Session",
+            "in": "header",
+            "description": "Session key",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "operation",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "deposit",
+              "withdraw"
+            ],
+            "description": "Operations 'deposit' or 'withdrawal'"
+          },
+          {
+            "name": "processor",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "Set to 'piq'"
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "en_GB",
+            "description": "Defaults to en_GB"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment url",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "type": "string",
+                  "description": "Payment url"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/responses/Info"
+          }
+        }
+      }
+    },
+    "/game/{id}": {
+      "get": {
+        "tags": [
+          "Game Library",
+          "Protected"
+        ],
+        "summary": "Get a single game",
+        "parameters": [
+          {
+            "name": "Blue-Session",
+            "in": "header",
+            "description": "Session key",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Game id"
+          },
+          {
+            "name": "play_for_fun",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "By default disabled, set to 1 to enable play for fun mode. Session header not require if this option is present"
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "default": "en",
+            "description": "Default 'en'"
+          },
+          {
+            "name": "homeurl",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "Home url or return url. All games may not support this, usually for mobile ones"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Game",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "$ref": "#/definitions/Game"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/responses/Info"
+          }
+        }
+      }
+    },
+    "/player/page/{page}": {
+      "get": {
+        "tags": [
+          "Player",
+          "Cashier",
+          "Protected"
+        ],
+        "summary": "Player iframe pages",
+        "parameters": [
+          {
+            "name": "Blue-Session",
+            "in": "header",
+            "description": "Session key (not required for register page)",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "profile",
+              "cashier",
+              "register"
+            ],
+            "description": "Options profile, cashier, register"
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "description": "Set page language, defaults to en_GB",
+            "required": false,
+            "default": "en_GB",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Iframe url",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "info": {
+                  "$ref": "#/definitions/Info"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "page": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/responses/Info"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "PlayerFavorites": {
+      "description": "Collection of player favorites.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PlayerFavorite"
+      }
+    },
+    "PlayerLatests": {
+      "description": "Collection of player latest games.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PlayerLatest"
+      }
+    },
+    "PlayerRatings": {
+      "description": "Collection of player game ratings.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PlayerRating"
+      }
+    },
+    "PlayerFavorite": {
+      "description": "Storage of player",
+      "type": "object",
+      "required": [
+        "slot",
+        "gameId",
+        "dateAdded"
+      ],
+      "properties": {
+        "slot": {
+          "type": "integer",
+          "default": 0,
+          "description": "the orginal, base 0 slot number of the favorite"
+        },
+        "gameId": {
+          "type": "string",
+          "description": "The internal id of the game favorited."
+        },
+        "dateAdded": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "PlayerLatest": {
+      "description": "Latest game data for player.",
+      "type": "object",
+      "properties": {
+        "gameid": {
+          "type": "string"
+        },
+        "launchdatetime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "PlayerRating": {
+      "description": "A player game rating",
+      "type": "object",
+      "properties": {
+        "ratingScore": {
+          "type": "integer"
+        },
+        "gameid": {
+          "type": "string"
+        },
+        "ratingDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ratingNote": {
+          "type": "string",
+          "description": "Text rating of the game by player."
+        }
+      }
+    },
+    "Game": {
+      "description": "Game object",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "subcategory": {
+          "type": "string"
+        },
+        "details": {
+          "type": "string"
+        },
+        "new": {
+          "type": "string"
+        },
+        "system": {
+          "type": "string"
+        },
+        "position": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "image_preview": {
+          "type": "string"
+        },
+        "mobile": {
+          "type": "boolean"
+        },
+        "play_for_fun_supported": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Player": {
+      "description": "Player object",
+      "type": "object",
+      "required": [
+        "username",
+        "email",
+        "fname",
+        "lname",
+        "terms"
+      ],
+      "properties": {
+        "revId": {
+          "type": "integer",
+          "description": "the internal system revision id. Must be submitted with patch."
+        },
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "fname": {
+          "type": "string"
+        },
+        "lname": {
+          "type": "string"
+        },
+        "terms": {
+          "type": "boolean"
+        },
+        "ref_code": {
+          "type": "string",
+          "description": "(optional) create player under some subagent"
+        },
+        "newsletter": {
+          "type": "boolean",
+          "description": "(optional)"
+        },
+        "currency": {
+          "type": "string",
+          "description": "required only if multicurrency enabled"
+        },
+        "gender": {
+          "type": "string",
+          "description": "(optional)",
+          "enum": [
+            "M",
+            "F"
+          ]
+        },
+        "birthdate": {
+          "type": "string",
+          "description": "YYYY-MM-DD"
+        },
+        "address": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "zip": {
+          "type": "string"
+        },
+        "mobile": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "countrycode": {
+          "type": "string",
+          "description": "two letter country code"
+        },
+        "currencysymbol": {
+          "type": "string"
+        },
+        "languagecode": {
+          "type": "string",
+          "description": "language locale code",
+          "example": [
+            "en_GB",
+            "it_IT"
+          ]
+        },
+        "sessionid": {
+          "type": "string"
+        }
+      }
+    },
+    "CorePlayerInput": {
+      "description": "The most basic player data required for a player registration. \n",
+      "type": "object",
+      "required": [
+        "username",
+        "email",
+        "fname",
+        "lname",
+        "password",
+        "password_confirmation",
+        "terms",
+        "birthdate",
+        "countrycode"
+      ],
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "fname": {
+          "type": "string"
+        },
+        "lname": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "password_confirmation": {
+          "type": "string",
+          "description": "Must be the same as the password."
+        },
+        "terms": {
+          "type": "boolean"
+        },
+        "birthdate": {
+          "type": "string",
+          "description": "YYYY-MM-DD"
+        },
+        "countrycode": {
+          "type": "string",
+          "description": "two letter country code in lowercase"
+        },
+        "captcha": {
+          "type": "string"
+        }
+      }
+    },
+    "Transaction": {
+      "description": "Transaction",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "time_stamp": {
+          "type": "string"
+        },
+        "details": {
+          "type": "string"
+        },
+        "credit": {
+          "type": "string"
+        },
+        "debit": {
+          "type": "string"
+        },
+        "balance": {
+          "type": "string"
+        },
+        "transid": {
+          "type": "string"
+        },
+        "transby": {
+          "type": "string"
+        },
+        "agentuser": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string"
+        },
+        "system": {
+          "type": "string"
+        },
+        "accountuser": {
+          "type": "string"
+        }
+      }
+    },
+    "PlayerData": {
+      "description": "Object for submitting updates to player profile data. Similar to `PlayerRegistration`, but it is hardcoded to the PlayerProfile schema.\n",
+      "type": "object",
+      "required": [
+        "revId"
+      ],
+      "properties": {
+        "revId": {
+          "description": "The internal system revisionID, which was received from player GET. Submitting the revision id back to the system on update ensures that you will not unknowingly overwrite a concurent request.\n",
+          "type": "integer"
+        },
+        "fieldInstancesStr": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FieldInstanceStr"
+          }
+        },
+        "fieldInstancesNum": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FieldInstanceNum"
+          }
+        },
+        "fieldInstancesArr": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FieldInstanceArr"
+          }
+        },
+        "fieldInstancesObj": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FieldInstanceObj"
+          }
+        }
+      }
+    },
+    "PlayerRegistration": {
+      "description": "Object for submitting player registration data. Since player registration data is dynamic, and based on\ndynamic schemas, with dynamic value types, registration data is submitted using an object which contains\narrays of the 4 possible value types; \n  \n  * strings\n  * numbers\n  * arrays\n  * objects\n  \n  This combination of field name, type and value is termed a FieldInstance.\n",
+      "type": "object",
+      "properties": {
+        "schemaCode": {
+          "$ref": "#/definitions/SchemaCode"
+        },
+        "fieldInstancesStr": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FieldInstanceStr"
+          }
+        },
+        "fieldInstancesNum": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FieldInstanceNum"
+          }
+        },
+        "fieldInstancesArr": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FieldInstanceArr"
+          }
+        },
+        "fieldInstancesObj": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FieldInstanceObj"
+          }
+        }
+      }
+    },
+    "PlayerSchema": {
+      "type": "object",
+      "description": "Player Schemas are both data models and form views for player data on the Gaming Portal. PlayerSchemas are used both in the registration process as well as in the Player Profile. A PlayerSchema is identified by a name and a unique code, and contains an array of fields.\n",
+      "properties": {
+        "schemaName": {
+          "type": "string",
+          "description": "A human readable description of the player schema object."
+        },
+        "schemaCode": {
+          "$ref": "#/definitions/SchemaCode"
+        },
+        "fields": {
+          "description": "An array of the fields used in the",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FieldDef"
+          }
+        }
+      }
+    },
+    "SchemaCode": {
+      "type": "string",
+      "description": "Short code for the player schema"
+    },
+    "Field": {
+      "type": "object",
+      "description": "Base definition of a field, which is then either a FieldInstance, or a FieldDefinition.",
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "unique code for the field"
+        }
+      }
+    },
+    "InvalidField": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "unique code for the field"
+        },
+        "validators": {
+          "description": "Array of validators, with only the required fields.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Validators"
+          }
+        }
+      }
+    },
+    "FieldInstance": {
+      "description": "Base field instance, for which all field instance types are desendant.",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Field"
+        },
+        {
+          "type": "object",
+          "discriminator": "dataType",
+          "required": [
+            "dataType"
+          ],
+          "properties": {
+            "dataType": {
+              "$ref": "#/definitions/DataType"
+            }
+          }
+        }
+      ]
+    },
+    "FieldInstanceStr": {
+      "description": "Field instance for field values which are strings",
+      "allOf": [
+        {
+          "$ref": "#/definitions/FieldInstance"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "FieldInstanceNum": {
+      "description": "Field instance for field values which are numbers",
+      "allOf": [
+        {
+          "$ref": "#/definitions/FieldInstance"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "number"
+            }
+          }
+        }
+      ]
+    },
+    "FieldInstanceArr": {
+      "description": "Field instance for field values which are arrays",
+      "allOf": [
+        {
+          "$ref": "#/definitions/FieldInstance"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "FieldInstanceObj": {
+      "description": "Field instance for field values which are objects.",
+      "allOf": [
+        {
+          "$ref": "#/definitions/FieldInstance"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "object"
+            }
+          }
+        }
+      ]
+    },
+    "FieldDef": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Field"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "human readable name of the field"
+            },
+            "code": {
+              "type": "string",
+              "description": "unique code for the field"
+            },
+            "fieldType": {
+              "type": "string",
+              "description": "The field type. One of the supported field types. Some field types have special handling and purpose. For example; the TAC type is a special field for Terms and Conditions.\n",
+              "enum": [
+                "date",
+                "datetime",
+                "boolean",
+                "password",
+                "dropdown",
+                "float",
+                "link",
+                "multiselect",
+                "radio",
+                "string",
+                "text",
+                "number",
+                "tel",
+                "color",
+                "TAC",
+                "Country"
+              ]
+            },
+            "dataType": {
+              "$ref": "#/definitions/DataType"
+            },
+            "HTML5Hint": {
+              "type": "string",
+              "description": "A hint to the preffered HTML5 input widget to use for this field.",
+              "enum": [
+                "search",
+                "email",
+                "url",
+                "tel",
+                "number",
+                "range",
+                "date",
+                "month",
+                "week",
+                "time",
+                "datetime",
+                "datetime-local",
+                "color"
+              ]
+            },
+            "cssclass": {
+              "type": "string",
+              "description": "Suggested/mapped css class"
+            },
+            "order": {
+              "type": "integer",
+              "description": "suggestes field order"
+            },
+            "group": {
+              "type": "string",
+              "description": "the group that the field belongs to"
+            },
+            "defaultValue": {
+              "description": "The default value \"slug\" for a dropdown or multiselect type (only)",
+              "type": "string"
+            },
+            "required": {
+              "type": "boolean",
+              "description": "This field is required, and must have a valid value."
+            },
+            "readOnly": {
+              "type": "boolean",
+              "default": false,
+              "description": "This field cannot be changed by the API after original submission, due to sustem or complience reasons."
+            },
+            "valueList": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DropDownValue"
+              }
+            },
+            "validators": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Validators"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "DataType": {
+      "type": "string",
+      "description": "The JSON data type expected by the system.",
+      "enum": [
+        "string",
+        "number",
+        "boolean",
+        "array",
+        "object",
+        "value"
+      ]
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "messsage": {
+          "type": "string"
+        }
+      }
+    },
+    "DropDownValue": {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "order": {
+          "type": "integer",
+          "description": "The suggested order of the item"
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the dropdown value. This is not the value (usually) to display on the UI, rather it is the \"slug\" used for the value, what should be retured to the system. Always is returned as string so check the isNumber value to see if you should cast to number."
+        },
+        "isNumber": {
+          "type": "boolean",
+          "description": "Since we always return DD values as strings, use this to cast the values to number if required."
+        }
+      }
+    },
+    "Validators": {
+      "description": "A validator with order, as returned with other validators.",
+      "type": "object",
+      "required": [
+        "order"
+      ],
+      "properties": {
+        "order": {
+          "type": "integer",
+          "description": "The order in which the validator is applied."
+        },
+        "validator": {
+          "$ref": "#/definitions/Validator"
+        }
+      }
+    },
+    "Validator": {
+      "description": "A validator definition. Each validator has a name, and a key which identifies the validator. The name and\nkey should be descriptive of that the validator is doing.\n",
+      "type": "object",
+      "required": [
+        "key",
+        "invalid_message"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Twelve charactar (UPPER CASE), unique short code idenfifying the validator",
+          "minLength": 12,
+          "maxLength": 12
+        },
+        "invalid_message": {
+          "description": "The slug that will be returned upon invalidation.",
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 15
+        },
+        "warning": {
+          "type": "boolean",
+          "description": "Violations are only warnings"
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name of the validator"
+        },
+        "parameters": {
+          "description": "Key value pair of parameters for the validator",
+          "type": "object"
+        },
+        "description": {
+          "type": "string",
+          "description": "A developers description of what the validator validates, not for use on the UI."
+        }
+      }
+    },
+    "Info": {
+      "description": "Response information, anything that is not response data itself.",
+      "type": "object",
+      "required": [
+        "success",
+        "resultCode"
+      ],
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "default": true
+        },
+        "resultCode": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "responseTime": {
+          "type": "number",
+          "format": "float"
+        },
+        "pageNum": {
+          "description": "The current page number, 0 if no pages",
+          "type": "integer"
+        },
+        "pages": {
+          "description": "The total number of pages, 0 if not paged.",
+          "type": "integer"
+        },
+        "pageSize": {
+          "description": "The size of each page, 0 if no paging.",
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "responses": {
+    "InvalidPlayerdata": {
+      "description": "Information returned when player data posted is invalidated by the schema.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "info": {
+            "$ref": "#/definitions/Info"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "record": {
+                "description": "Additional information about record level invalidation.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/Error"
+                }
+              },
+              "fields": {
+                "description": "an array of invalid fields, with an array of the invalid validators.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/InvalidField"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Info": {
+      "description": "Response information",
+      "schema": {
+        "type": "object",
+        "required": [
+          "success",
+          "resultCode"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "default": true
+          },
+          "resultCode": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "responseTime": {
+            "type": "number",
+            "format": "float"
+          },
+          "pageNum": {
+            "description": "The current page number, 0 if no pages",
+            "type": "integer"
+          },
+          "pages": {
+            "description": "The total number of pages, 0 if not paged.",
+            "type": "integer"
+          },
+          "pageSize": {
+            "description": "The size of each page, 0 if no paging.",
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "Session": {
+      "name": "Blue-Session",
+      "in": "header",
+      "description": "Session key",
+      "required": true,
+      "type": "string"
+    }
+  }
+}
