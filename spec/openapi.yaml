@@ -157,6 +157,8 @@ tags:
   description: Endpoints for managing the cache
 - name: Powershop
   description: Endpoints for communication with powershop service
+- name: Paynplay
+  description: Endpoints for communication with Trustly's Paynplay service
 - name: Licence
   description: Endpoints related to licence checks
 - name: Connectivity
@@ -3695,13 +3697,24 @@ paths:
         200:
           description: Success!
 
-  /player/paynplay/deposit:
+  /paynplay/deposit:
     post:
       tags:
-      - Player
-      - Unimplemented
+      - Paynplay
       summary: paynplay deposit
-      description: proxy to CE
+      description: proxy to CE. URL in the response is the iframe URL. All of the parameters inside req body will be provided by frontend (including success & fail URLs). In headers, you can expect only Origin and x-igp-session (anon) from frontend.
+      parameters:
+      - $ref: '#/parameters/Session'
+      responses:
+        200:
+          description: Success!
+  
+  /paynplay/check:
+    post:
+      tags:
+      - Paynplay
+      summary: paynplay check session
+      description: The frontend will send sessionId inside body. In headers, you expect x-igp-session (anon) and Origin. This is what registers/logs in player (via trustly session ID). If sessionId is valid, core engine will return response as the player logged in to the system.
       parameters:
       - $ref: '#/parameters/Session'
       responses:
