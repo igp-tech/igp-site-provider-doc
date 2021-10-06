@@ -113,7 +113,7 @@ info:
       * token_expired - token expired
       * game_not_available
 
-  version: "2.4.10"
+  version: "3.x"
 tags:
 - name: Player
   description: |
@@ -167,6 +167,8 @@ tags:
   description: Endpoints that are legacy/or could not be tested
 - name: Emails
   description: Endpoints related to emails
+- name: KYC
+  description: Endpoints related to kyc
 host: demo-api.igp.cloud
 schemes:
 - https
@@ -1348,7 +1350,29 @@ paths:
             properties:
               info:
                 $ref: "#/definitions/Info"
-
+  
+  /portal/playStats/mostPlayedGames:
+    get:
+      tags:
+      - Limits
+      summary: Gets player's most played games.
+      parameters:
+      - $ref: "#/parameters/Origin"
+      - name: period
+        in: query
+        type: string
+        required: true
+      responses:
+        200:
+          description: Success.
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                    
   /portal/getLimitsConfig:
     get:
       tags:
@@ -1382,6 +1406,132 @@ paths:
                   limitDisplay:
                     type: boolean
 
+  /player/limits/self_exclude:
+    post:
+      tags:
+      - Player
+      - Limits
+      summary: Allows player to self exclude
+      parameters:
+      - $ref: "#/parameters/Session"
+      - $ref: "#/parameters/Origin"
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            password:
+              type: string
+            amount:
+              type: number
+      responses:
+        200:
+          description: Player bonuses
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  sucess:
+                    type: boolean
+        400:
+          description: Unable to fetch bonuses
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+                
+  /player/kyc/requestVerification:
+    post:
+      tags:
+      - Player
+      - KYC
+      summary: Request kyc verification
+      parameters:
+      - $ref: "#/parameters/Session"
+      - $ref: "#/parameters/Origin"
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            documentType:
+              type: string
+              enum:
+              - ID
+              - PROOF_OF_ADDRESS
+              - SOURCE_OF_WEALTH
+              - BANK_STATEMENT
+              - PAYMENT_METHOD
+      responses:
+        200:
+          description: Returns jumio link for verification
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                properties:
+                  jumioLink: 
+                    type: string
+        400:
+          description: Error requesting verification
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+
+  /player/kyc/activeVerifications:
+    get:
+      tags:
+      - Player
+      - KYC
+      summary: Get list of active kyc verifications
+      parameters:
+      - $ref: "#/parameters/Session"
+      - $ref: "#/parameters/Origin"
+      responses:
+        200:
+          description: Active verifications
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    requestedAt:
+                      type: string
+                    uploadedAt:
+                      type: string
+                    verifiedStatus:
+                      type: string
+                    success:
+                      type: boolean
+                    submitted:
+                      type: boolean
+        400:
+          description: Error requesting verification
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+                
   /player/bonus:
     get:
       tags:
@@ -2203,8 +2353,59 @@ paths:
                 $ref: "#/definitions/Info"
         '401':
           $ref: '#/responses/Info'
-
-
+  
+  /player/emailChange:
+    post:
+      tags:
+      - Player
+      summary: Initiate email change process
+      description: >
+        Possible error codes (resultCode): email_reset_too_soon, player_not_found
+      parameters:
+      - $ref: "#/parameters/Session"
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+            password:
+              type: string
+      responses:
+        '200':
+          description: Sucessfully sent
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        '401':
+          $ref: '#/responses/Info'
+          
+  /player/emailChange/confirm/:token:
+    post:
+      tags:
+      - Player
+      summary: Confirm email change with token from email
+      parameters:
+      - $ref: "#/parameters/Session"
+      - name: token
+        type: string
+        in: path
+        required: true
+      responses:
+        '200':
+          description: Sucessfully confirmed
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        '401':
+          $ref: '#/responses/Info'
+          
   /termsofuse:
     get:
       tags:
@@ -3345,6 +3546,7 @@ paths:
                     type: number
         400:
           $ref: '#/responses/Error'
+
   /player/freerounds:
     get:
       tags:
@@ -3683,26 +3885,42 @@ paths:
       responses:
         200:
           description: Success!
-
-  /player/paynplay/continue:
+  
+  /paynplay/emailchange:
     post:
       tags:
       - Player
-      - Unimplemented
-      summary: paynplay continue
-      description: proxy to CE
+      - Paynplay
+      summary: Initiate paynplay email change
+      description: >
+        Possible error codes (resultCode): email_reset_too_soon, player_not_found
       parameters:
-      - $ref: '#/parameters/Session'
+      - $ref: "#/parameters/Session"
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
       responses:
-        200:
-          description: Success!
+        '200':
+          description: Sucessfully sent
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+        '401':
+          $ref: '#/responses/Info'
 
   /paynplay/deposit:
     post:
       tags:
       - Paynplay
       summary: paynplay deposit
-      description: proxy to CE. URL in the response is the iframe URL. All of the parameters inside req body will be provided by frontend (including success & fail URLs). In headers, you can expect only Origin and x-igp-session (anon) from frontend.
+      description: URL in the response is the iframe URL. All of the parameters inside req body will be provided by frontend (including success & fail URLs). Only only Origin and x-igp-session should be received in this endpoint.
       parameters:
       - $ref: '#/parameters/Session'
       responses:
@@ -3714,33 +3932,7 @@ paths:
       tags:
       - Paynplay
       summary: paynplay check session
-      description: The frontend will send sessionId inside body. In headers, you expect x-igp-session (anon) and Origin. This is what registers/logs in player (via trustly session ID). If sessionId is valid, core engine will return response as the player logged in to the system.
-      parameters:
-      - $ref: '#/parameters/Session'
-      responses:
-        200:
-          description: Success!
-
-  /player/paynplay/success:
-    post:
-      tags:
-      - Player
-      - Unimplemented
-      summary: paynplay success route
-      description: proxy to CE
-      parameters:
-      - $ref: '#/parameters/Session'
-      responses:
-        200:
-          description: Success!
-
-  /player/paynplay/email:
-    put:
-      tags:
-      - Player
-      - Unimplemented
-      summary: paynplay players email update
-      description: proxy to CE
+      description: The frontend will send sessionId inside body. In headers, you expect x-igp-session and Origin. This is what registers/logs in player (via trustly session ID). If sessionId is valid, core engine will return response as the player logged in to the system.
       parameters:
       - $ref: '#/parameters/Session'
       responses:
@@ -4319,7 +4511,34 @@ paths:
                 properties:
                   gdpr_settings:
                     type: string
-
+  
+  /player/loyalty/contribution/:gameId:
+    get:
+      tags:
+      - Loyalty
+      - Vault
+      summary: returns player loyalty points contribution for game
+      parameters:
+      - $ref: "#/parameters/Session"
+      - $ref: "#/parameters/Origin"
+      - name: gameId
+        type: string
+        in: path
+        required: true
+      responses:
+        200:
+          description : Success
+          schema:
+            type: object
+            properties:
+              info:
+                $ref: "#/definitions/Info"
+              data:
+                type: object
+                
+        400:
+          $ref: '#/responses/Error'
+          
   /player/loyaltyPoints:
     get:
       tags:
