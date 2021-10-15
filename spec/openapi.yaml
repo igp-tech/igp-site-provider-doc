@@ -1204,28 +1204,6 @@ paths:
               info:
                 $ref: "#/definitions/Info"
 
-  /service/player/setStatus/{status}:
-    put:
-      tags:
-      - Player
-      - Protected
-      summary: Changes the status of the player ("Frozen", "Validated", etc).
-      parameters:
-      - $ref: "#/parameters/Session"
-      - $ref: "#/parameters/ApiKey"
-      - name: status
-        in: path
-        type: string
-        required: true
-      responses:
-        200:
-          description: Status Set.
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-  
   /portal/playStats/mostPlayedGames:
     get:
       tags:
@@ -1561,33 +1539,6 @@ paths:
               info:
                 $ref: "#/definitions/Info"
 
-  /player/remaining/deposit:
-    get:
-      tags:
-      - Player
-      - Protected
-      summary: Player remaining deposits regarding deposits limit
-      parameters:
-      - $ref: "#/parameters/Session"
-      - $ref: "#/parameters/Origin"
-      responses:
-        200:
-          description: Remaining deposits
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              data:
-                properties:
-                  amount_current:
-                    type: number
-                  amount_available:
-                    type: number
-                  limit:
-                    type: number
-                  interval:
-                    type: string
   /player/game/{id}:
     get:
       tags:
@@ -2150,34 +2101,6 @@ paths:
         400:
           $ref: '#/responses/Info'
 
-
-  /player/setNewPassword:
-    post:
-      tags:
-      - Player
-      summary: Player change password
-      description: >
-        Possible error codes (resultCode): new_password_missing, invalid_new_password
-      parameters:
-      - $ref: "#/parameters/Session"
-      - $ref: "#/parameters/Origin"
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            password:
-              type: string
-      responses:
-        200:
-          description: Password set successfuly
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-
   /player/logout:
     get:
       tags:
@@ -2652,38 +2575,6 @@ paths:
                 $ref: "#/definitions/Info"
         '401':
           $ref: '#/responses/Info'
-
-  /player/messages:
-    get:
-      tags:
-      - Player
-      - Cashier
-      - Protected
-      summary: Get messages for player ( deposit/withdraw configurations, Errors)
-      parameters:
-      - $ref: "#/parameters/Session"
-      - $ref: "#/parameters/Origin"
-      responses:
-        '200':
-          description: Response object
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              data:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                    type:
-                      type: string
-                      enum:
-                      - notification
-                      - Error
-
 
   /player/cashier/custom/{transtype}:
     get:
@@ -3357,33 +3248,6 @@ paths:
         400:
           $ref: '#/responses/Error'
 
-  /player/sportsbets:
-    post:
-      summary: Get player sportsbets/ not implemented
-      tags:
-      - Under Review/Untested
-      - Player
-      responses:
-        200:
-          description: Success!
-
-
-  /player/sportsBets/{couponCode}:
-    post:
-      summary: Get player sportsbets by coupon code/ not implemented
-      tags:
-      - Under Review/Untested
-      - Player
-      parameters:
-      - name: couponCode
-        in: path
-        type: string
-        required: true
-      responses:
-        200:
-          description: Success!
-
-
   /player/cashback:
     post:
       tags:
@@ -3493,108 +3357,6 @@ paths:
                         type: string
                     forfeited:
                       type: boolean
-        400:
-          $ref: '#/responses/Error'
-
-  /player/freeround-program/{slug}:
-    get:
-      tags:
-      - Player
-      - Freerounds
-      summary: Get freeround-programs
-      parameters:
-      - $ref: "#/parameters/Session"
-      - $ref: "#/parameters/Origin"
-      - name: slug
-        in: path
-        type: string
-        required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              data:
-                type: object
-                properties:
-                  state:
-                    type: string
-                  portalId:
-                    type: string
-                  slug:
-                    type: string
-                  triggersBonus:
-                    type: string
-                  allowOnlyOneCurrency:
-                    type: boolean
-                  activationDepositRequirements:
-                    type: object
-                  depositsSumUp:
-                    type: boolean
-                  order:
-                    type: number
-                  playerId:
-                    type: string
-                  playerUsername:
-                    type: string
-                  playerEmail:
-                    type: string
-                  deposited:
-                    type: number
-        400:
-          $ref: '#/responses/Error'
-
-  /player/freeround-program/{slug}/allocate:
-    get:
-      tags:
-      - Player
-      - Freerounds
-      summary: Get freeround-programs
-      parameters:
-      - $ref: "#/parameters/Session"
-      - $ref: "#/parameters/Origin"
-      - name: slug
-        in: path
-        type: string
-        required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              data:
-                type: object
-                properties:
-                  state:
-                    type: string
-                  portalId:
-                    type: string
-                  slug:
-                    type: string
-                  triggersBonus:
-                    type: string
-                  allowOnlyOneCurrency:
-                    type: boolean
-                  activationDepositRequirements:
-                    type: object
-                  depositsSumUp:
-                    type: boolean
-                  order:
-                    type: number
-                  playerId:
-                    type: string
-                  playerUsername:
-                    type: string
-                  playerEmail:
-                    type: string
-                  deposited:
-                    type: number
         400:
           $ref: '#/responses/Error'
 
@@ -3726,28 +3488,6 @@ paths:
                 $ref: "#/definitions/Info"
         400:
           $ref: '#/responses/Error'
-
-  /player/fraudCheck/{playerIp}:
-    get:
-      tags:
-      - Player
-      summary: calls geoIpHost to check players IP
-      parameters:
-      - $ref: "#/parameters/Session"
-      - $ref: "#/parameters/Origin"
-      - name: playerIp
-        in: path
-        type: string
-        required: true
-      responses:
-        200:
-          description: Success
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-
 
   /player/bonus/switch:
     put:
@@ -4275,58 +4015,6 @@ paths:
               info:
                 $ref: "#/definitions/Info"
 
-  /player/sportsbook/{mode}:
-    post:
-      tags:
-      - Games
-      - Under Review/Untested
-      - Unimplemented
-      summary: Gets player's sportsbook games, by mode {live | standard}
-      parameters:
-      - name: mode
-        in: path
-        type: string
-        required: true
-      responses:
-        200:
-          description: Success!
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-
-  /service/player/forcedLogin:
-    post:
-      tags:
-      - Auth hub
-      summary: Used by authHub to force login player to CE
-      parameters:
-      - name: payload
-        in: body
-        schema:
-          type: object
-          properties:
-            playerId:
-              type: string
-              description: player id
-            portalId:
-              type: string
-              description: portal id
-      - $ref: "#/parameters/ApiKey"
-      responses:
-        200:
-          description : Success
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              data:
-                $ref: "#/definitions/Player"
-        400:
-          $ref: '#/responses/Error'
-
   /player/gdpr:
     get:
       tags:
@@ -4568,79 +4256,6 @@ paths:
                           description: Portal id
         400:
           $ref: '#/responses/Error'
-
-  /player/privacypolicy:
-    post:
-      tags:
-      - Player
-      summary: Sets gdpr settings per player account.
-      parameters:
-      - name: body
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            policy:
-              type: number
-              description: numeric definition of privacy policy
-      - $ref: "#/parameters/Session"
-      - $ref: "#/parameters/Origin"
-      responses:
-        200:
-          description: Success
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              data:
-                type: object
-                properties:
-                  policy:
-                    type: number
-                    description: numeric version of privacy policy
-        400:
-          description: Failure; missing_version or invalid_version if not numeric
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-
-  /privacypolicy/{lang}:
-    get:
-      tags:
-      - Validation
-      summary: Provides a list of possible validators, as JS methods of the Portal object.
-      parameters:
-      - name: lang
-        type: string
-        in: path
-        required: true
-      responses:
-        200:
-          description: success!
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
-              data:
-                type: object
-                properties:
-                  privacyPolicyVersion:
-                    type: number
-                  privacyPolicyPlainText:
-                    type: string
-                    description: version associated text
-        400:
-          description: sent param doesn't match privacy policy
-          schema:
-            type: object
-            properties:
-              info:
-                $ref: "#/definitions/Info"
 
   /validateMyAffiliateCode/{code}:
     get:
