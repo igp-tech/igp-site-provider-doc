@@ -10,7 +10,7 @@
     "gulp-cli": "^2.2.0",
     "gulp-connect": "^5.7.0",
     "portfinder": "^1.0.25",
-    "shelljs": "^0.8.3",
+    "shelljs": "^0.8.5",
     "swagger": "^0.7.5",
     "swagger-repo": "^2.0.0-rc.15",
     "swagger-ui": "^3.25.0"
