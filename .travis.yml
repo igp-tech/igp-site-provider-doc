@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+  - "node"
+deploy:
+  - skip_cleanup: true
+    provider: script
+    script: npm run deploy
+    on:
+      branch: master
+  - skip_cleanup: true
+    provider: script
+    script: npm run deploy-branch
+    on:
+      all_branches: true
+      condition: '"$TRAVIS_BRANCH" != "master" && "$TRAVIS_BRANCH" != "gh-pages"'
+notifications:
+  slack:
+    rooms:
+      - autaut:2TOt6Pb3YoUl7lVBD3rCB6m5
+    template:
+      - "%{repository} (%{commit}) : %{message} By: %{author}"
+      - "%{commit_message}"
+      - "The new docs are available at: (https://igp-tech.github.io/igp-site-provider-doc/)"
+
+

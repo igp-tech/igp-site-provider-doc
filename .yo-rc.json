@@ -1,0 +1,11 @@
+{
+  "generator-openapi-repo": {
+    "importExistingSpec": true,
+    "importedSpec": "swagger.yaml",
+    "name": "iGP Site Provider",
+    "repo": "igp-tech/igp-site-provider-doc",
+    "splitSpec": false,
+    "samples": false,
+    "installSwaggerUI": true
+  }
+}
